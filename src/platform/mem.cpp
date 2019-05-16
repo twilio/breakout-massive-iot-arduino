@@ -21,7 +21,7 @@
  * \file mem.c - memory debugging utilities
  */
 
-#include "mem.h"
+#include "massive-sdk/src/platform/mem.h"
 
 #if WITH_MEM_DEBUG == 1
 

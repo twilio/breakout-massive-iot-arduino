@@ -21,7 +21,8 @@
  * \file utils.cpp - logging utilities
  */
 
-#include "log.h"
+#include "massive-sdk/src/platform/log.h"
+#include "massive-sdk/src/platform/time.h"
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -29,11 +30,7 @@
 
 #include <usb_serial.h>
 
-#include "../../board.h"
-
-#include "time.h"
-
-
+#include "board.h"
 
 int write_reliably(USBSerial *serial, const char *buf, int len) {
   if (!serial) return 0;
@@ -175,7 +172,7 @@ static char *owl_log_level_color(log_level_t level) {
 #endif
 }
 
-extern "C" void owl_log(log_level_t level, char *format, ...) {
+extern "C" void owl_log(log_level_t level, const char *format, ...) {
   if (!IS_PRINTABLE(level)) return;
   char buf[LOG_LINE_MAX_LEN];
   int cnt          = 0;
@@ -218,7 +215,7 @@ extern "C" void owl_log(log_level_t level, char *format, ...) {
 #endif
 }
 
-extern "C" void owl_log_empty(log_level_t level, char *format, ...) {
+extern "C" void owl_log_empty(log_level_t level, const char *format, ...) {
   if (!IS_PRINTABLE(level)) return;
   char buf[LOG_LINE_MAX_LEN];
   int cnt = 0;

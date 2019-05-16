@@ -1,4 +1,5 @@
-
+#include "massive-sdk/src/platform/power.h"
+#include "board.h"
 
 void owlPowerOn(uint32_t power_bitmask) {
   if (power_bitmask & OWL_POWER_RN4) {

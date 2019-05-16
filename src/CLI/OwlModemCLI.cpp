@@ -26,9 +26,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "../CoAP/CoAPPeer.h"
-#include "../DTLS/OwlDTLSClient.h"
-#include "../Breakout.h"
+#include "massive-sdk/src/CoAP/CoAPPeer.h"
+#include "massive-sdk/src/DTLS/OwlDTLSClient.h"
+#include "../Breakout/Breakout.h"
 
 
 
@@ -126,14 +126,12 @@ class RawGNSSBypass : public OwlModemCLIExecutor {
 class PowerOn : public OwlModemCLIExecutor {
  public:
   PowerOn()
-      : OwlModemCLIExecutor("powerOn", "<module_bitmask>", "Power on modules - 1 modem, 2 Grove, 4 RGBLED, 8 GNSS\r\n",
-                            1, 1) {
+      : OwlModemCLIExecutor("powerOn", "Power on module\r\n") {
   }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    owl_power_m bit_mask = (owl_power_m)0;
-    bit_mask             = (owl_power_m)str_to_uint32_t(cmd.argv[0], 10);
-    cli.owlModem->powerOn(bit_mask);
+    // TODO: power GNSS, Grove and LED
+    cli.owlModem->powerOn();
   }
 };
 
@@ -142,14 +140,12 @@ class PowerOn : public OwlModemCLIExecutor {
 class PowerOff : public OwlModemCLIExecutor {
  public:
   PowerOff()
-      : OwlModemCLIExecutor("powerOff", "<module_bitmask>", "Power on modules - 1 modem, 2 Grove, 4 RGBLED, 8 GNSS\r\n",
-                            1, 1) {
+      : OwlModemCLIExecutor("powerOff", "Power on module\r\n") {
   }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    owl_power_m bit_mask = (owl_power_m)0;
-    bit_mask             = (owl_power_m)str_to_uint32_t(cmd.argv[0], 10);
-    cli.owlModem->powerOff(bit_mask);
+    // TODO: unpower GNSS, Grove and LED
+    cli.owlModem->powerOff();
   }
 };
 
@@ -651,7 +647,7 @@ class GetSignalQuality : public OwlModemCLIExecutor {
           count = 0;
           break;
         }
-        delay(100);
+        owl_delay(100);
       }
     } while (count > 0);
   }
@@ -1912,10 +1908,9 @@ class BreakoutReinitTransport : public OwlModemCLIExecutor {
 
 #define MAX_COMMANDS 90
 
-OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, USBSerial *debug_port) {
+OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   this->owlModem  = modem;
   this->debugPort = debug_port;
-  if (debug_port) debug_port->enableBlockingTx();  // reliably write to it
 
   executors = (OwlModemCLIExecutor **)owl_malloc(MAX_COMMANDS * sizeof(OwlModemCLIExecutor *));
 
@@ -2055,7 +2050,7 @@ int OwlModemCLI::handleUserInput(int resume) {
   if (!resume) {
     // flush debug port on startup
     while (debugPort->available()) {
-      c = debugPort->read();
+      debugPort->read((uint8_t*) &c, 1);
     }
     LOGF(L_CLI, "\r\n");
     LOGF(L_CLI, "Welcome to the OwlModem simple CLI interface!\r\n");
@@ -2071,7 +2066,7 @@ int OwlModemCLI::handleUserInput(int resume) {
     command.len = 0;
   }
   while (debugPort->available()) {
-    c = debugPort->read();
+    debugPort->read((uint8_t*) &c, 1);
     switch (c) {
       case '\n':
       case '\r':
@@ -2214,7 +2209,7 @@ int OwlModemCLI::handleUserInput(int resume) {
 
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write(c);
+          debugPort->write((uint8_t*) &c, 1);
         }
         break;
 
@@ -2244,7 +2239,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           }
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write(c);
+          debugPort->write((uint8_t*) &c, 1);
         }
         break;
 
@@ -2254,7 +2249,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           command.len -= 2;
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write(c);
+          debugPort->write((uint8_t*) &c, 1);
         }
         break;
 
@@ -2264,7 +2259,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           command.len -= 2;
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write(c);
+          debugPort->write((uint8_t*) &c, 1);
         }
         break;
       default:
@@ -2272,7 +2267,7 @@ int OwlModemCLI::handleUserInput(int resume) {
         //          SerialUSB.print((int)c);
         //          SerialUSB.print(")");
         if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-        debugPort->write(c);
+        debugPort->write((uint8_t*) &c, 1);
     }
   }
 

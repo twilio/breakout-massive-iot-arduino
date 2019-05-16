@@ -1,4 +1,4 @@
-#include "IOwlSerial.h"
+#include "massive-sdk/src/modem/IOwlSerial.h"
 #include <usb_serial.h>
 #include <HardwareSerial.h>
 
@@ -26,7 +26,8 @@ class ArduinoSeeedUSBOwlSerial : public IOwlSerial {
 
 class ArduinoSeeedHwOwlSerial : public IOwlSerial {
  public:
-  ArduinoSeeedHwOwlSerial(HardwareSerial *serial) : serial_(serial) {
+  ArduinoSeeedHwOwlSerial(HardwareSerial *serial, int baudrate) : serial_(serial) {
+    serial_->begin(baudrate);
   }
   virtual ~ArduinoSeeedHwOwlSerial() {
     if (serial_) serial_->end();

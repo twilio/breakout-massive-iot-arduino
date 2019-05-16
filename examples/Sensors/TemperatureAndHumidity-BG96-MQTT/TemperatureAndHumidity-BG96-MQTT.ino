@@ -1,5 +1,6 @@
 #include <board.h>
-#include <BreakoutSDK/modem/OwlModemBG96.h>
+#include <massive-sdk/src/modem/OwlModemBG96.h>
+#include <platform/ArduinoSeeedOwlSerial.h>
 #include <stdio.h>
 
 // https://github.com/Seeed-Studio/Grove_Temperature_And_Humidity_Sensor
@@ -111,6 +112,7 @@ str tls_cacert = STRDECL(
 #define MQTT_PASSWORD NULL
 
 OwlModemBG96 *bg96_modem = nullptr;
+ArduinoSeeedHwOwlSerial *grove_serial = nullptr;
 
 #define LOOP_INTERVAL (200)
 #define SEND_INTERVAL (5 * 1000)
@@ -176,7 +178,8 @@ void setup() {
   owl_log_set_level(L_INFO);
   LOG(L_WARN, "Arduino setup() starting up\r\n");
 
-  bg96_modem = new OwlModemBG96(&SerialGrove);
+  grove_serial = new ArduinoSeeedHwOwlSerial(&SerialGrove, BG96_Baudrate);
+  bg96_modem = new OwlModemBG96(grove_serial);
 
   LOG(L_WARN, "Powering on module...");
   if (!bg96_modem->powerOn()) {
@@ -186,7 +189,7 @@ void setup() {
   LOG(L_WARN, "... done powering on.\r\n");
 
   LOG(L_WARN, "Initializing the module and registering on the network...");
-  if (!bg96_modem->initModem()) {
+  if (!bg96_modem->initModem(TESTING_APN)) {
     LOG(L_WARN, "... error initializing.\r\n");
     fail();
   }

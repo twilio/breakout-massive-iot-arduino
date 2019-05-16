@@ -23,10 +23,10 @@
 
 #include <board.h>
 
-#include <BreakoutSDK/modem/OwlModemRN4.h>
-#include <BreakoutSDK/CLI/OwlModemCLI.h>
-#include <BreakoutSDK/CoAP/CoAPPeer.h>
-
+#include "massive-sdk/src/modem/OwlModemRN4.h"
+#include "CLI/OwlModemCLI.h"
+#include "massive-sdk/src/CoAP/CoAPPeer.h"
+#include "platform/ArduinoSeeedOwlSerial.h"
 
 
 /* Modem result buffer */
@@ -40,7 +40,8 @@ str modem_result = {.s = result_buffer, .len = 0};
  */
 static str sim_pin = STRDECL("000000");
 
-
+ArduinoSeeedUSBOwlSerial *debug_serial = 0;
+ArduinoSeeedHwOwlSerial *module_serial = 0;
 /* The Twilio-specific modem interface */
 OwlModemRN4 *owlModem = 0;
 /* This is only for API demonstration purposes, can be removed for in-production */
@@ -49,14 +50,13 @@ OwlModemCLI *owlModemCLI = 0;
 
 
 void setup() {
-  // This is a good place to make sure the port is initialized properly.
-  SerialDebugPort.enableBlockingTx();  // reliably write to it
-
   owl_log_set_level(L_INFO);
   LOG(L_NOTICE, "Arduino setup() starting up\r\n");
 
-  owlModem    = new OwlModemRN4(&SerialModule, &SerialDebugPort);
-  owlModemCLI = new OwlModemCLI(owlModem, &SerialDebugPort);
+  debug_serial = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
+  module_serial = new ArduinoSeeedHwOwlSerial(&SerialModule, SerialModule_Baudrate);
+  owlModem    = new OwlModemRN4(module_serial, debug_serial);
+  owlModemCLI = new OwlModemCLI(owlModem, debug_serial);
 
   LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - powering on modules\r\n");
   if (!owlModem->powerOn()) {
@@ -218,25 +218,25 @@ void test_modem_bypass() {
 
 
 void test_modem_get_info() {
-  if (!owlModem->information.getProductIdentification(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getProductIdentification(&modem_result)) {
     LOG(L_ERR, "Error retrieving Product Information\r\n");
   } else {
     LOG(L_INFO, "Product Information:\r\n%.*s\r\n--------------------\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getManufacturer(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getManufacturer(&modem_result)) {
     LOG(L_ERR, "Error retrieving Manufacturer Information\r\n");
   } else {
     LOG(L_INFO, "Manufacturer Information:\r\n%.*s\r\n-------------------------\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getModel(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getModel(&modem_result)) {
     LOG(L_ERR, "Error retrieving ModelInformation\r\n");
   } else {
     LOG(L_INFO, "Model Information:\r\n%.*s\r\n-------------------------\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getVersion(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getVersion(&modem_result)) {
     LOG(L_ERR, "Error retrieving Version Information\r\n");
   } else {
     LOG(L_INFO, "Version Information:\r\n%.*s\r\n-------------------------\r\n", modem_result.len, modem_result.s);
@@ -244,43 +244,43 @@ void test_modem_get_info() {
 
 
 
-  if (!owlModem->information.getIMEI(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getIMEI(&modem_result)) {
     LOG(L_ERR, "Error retrieving IMEI\r\n");
   } else {
     LOG(L_INFO, "IMEI: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->SIM.getICCID(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->SIM.getICCID(&modem_result)) {
     LOG(L_ERR, "Error retrieving ICCID\r\n");
   } else {
     LOG(L_INFO, "ICCID: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->SIM.getIMSI(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->SIM.getIMSI(&modem_result)) {
     LOG(L_ERR, "Error retrieving IMSI\r\n");
   } else {
     LOG(L_INFO, "IMSI: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->SIM.getMSISDN(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->SIM.getMSISDN(&modem_result)) {
     LOG(L_ERR, "Error retrieving IMSI\r\n");
   } else {
     LOG(L_INFO, "MSISDN: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getBatteryChargeLevels(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getBatteryChargeLevels(&modem_result)) {
     LOG(L_ERR, "Error retrieving Battery Charge Levels\r\n");
   } else {
     LOG(L_INFO, "Battery Charge Levels: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getIndicatorsHelp(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getIndicatorsHelp(&modem_result)) {
     LOG(L_ERR, "Error retrieving Indicators-Help\r\n");
   } else {
     LOG(L_INFO, "Indicators-Help: [%.*s]\r\n", modem_result.len, modem_result.s);
   }
 
-  if (!owlModem->information.getIndicators(&modem_result, MODEM_RESULT_LEN)) {
+  if (!owlModem->information.getIndicators(&modem_result)) {
     LOG(L_ERR, "Error retrieving Indicators\r\n");
   } else {
     LOG(L_INFO, "Indicators: [%.*s]\r\n", modem_result.len, modem_result.s);

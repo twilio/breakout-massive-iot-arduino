@@ -24,10 +24,8 @@
 #ifndef __OWL_MODEM_CLI_H__
 #define __OWL_MODEM_CLI_H__
 
-#include "../modem/enums.h"
-#include "../modem/OwlModemRN4.h"
-
-
+#include "massive-sdk/src/modem/enums.h"
+#include "massive-sdk/src/modem/OwlModemRN4.h"
 
 #define MODEM_CLI_CMD_HISTORY 16
 #define MODEM_CLI_CMD_LEN 256
@@ -100,7 +98,7 @@ class OwlModemCLIExecutor {
  */
 class OwlModemCLI {
  public:
-  OwlModemCLI(OwlModemRN4 *modem, USBSerial *debugPort);
+  OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debugPort);
 
   ~OwlModemCLI();
 
@@ -116,7 +114,7 @@ class OwlModemCLI {
 
 
   OwlModemRN4 *owlModem;
-  USBSerial *debugPort;
+  IOwlSerial *debugPort;
 
   char cmdHistory[MODEM_CLI_CMD_HISTORY][MODEM_CLI_CMD_LEN + 1]; /**< Command history */
   int cmdHistoryLen[MODEM_CLI_CMD_HISTORY];                      /**< Length of the entries. Because, reasons. */
