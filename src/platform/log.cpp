@@ -21,7 +21,7 @@
  * \file utils.cpp - logging utilities
  */
 
-#include "massive-sdk/src/platform/log.h"
+#include "massive-sdk/src/utils/log.h"
 #include "massive-sdk/src/platform/time.h"
 
 #include <stdlib.h>
