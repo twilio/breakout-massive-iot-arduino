@@ -107,7 +107,7 @@ str tls_cacert = STRDECL(
 
 #define MQTT_BROKER_HOST "10.64.95.217"
 #define MQTT_BROKER_PORT 11111
-#define MQTT_CLIENT_ID "arduino-bg96-gps"
+#define MQTT_CLIENT_ID "arduino-bg96-temperature"
 #define MQTT_LOGIN NULL
 #define MQTT_PASSWORD NULL
 
@@ -189,7 +189,17 @@ void setup() {
   LOG(L_WARN, "... done powering on.\r\n");
 
   LOG(L_WARN, "Initializing the module and registering on the network...");
-  if (!bg96_modem->initModem(TESTING_APN)) {
+  char *cops = nullptr;
+#ifdef MOBILE_OPERATOR
+  cops = MOBILE_OPERATOR;
+#endif
+
+  at_cops_format_e cops_format = AT_COPS__Format__Numeric;
+
+#ifdef MOBILE_OPERATOR_FORMAT
+  cops_format = MOBILE_OPERATOR_FORMAT;
+#endif
+  if (!bg96_modem->initModem(TESTING_APN, cops, cops_format)) {
     LOG(L_WARN, "... error initializing.\r\n");
     fail();
   }

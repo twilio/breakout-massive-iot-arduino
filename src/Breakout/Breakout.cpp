@@ -123,6 +123,18 @@ bool Breakout::initModem() {
   char c_buffer[64];
   str buffer = {.s = c_buffer, .len = 0};
 
+  char *cops = nullptr;
+#ifdef MOBILE_OPERATOR
+  cops = MOBILE_OPERATOR;
+#endif
+
+  at_cops_format_e cops_format = AT_COPS__Format__Numeric;
+
+#ifdef MOBILE_OPERATOR_FORMAT
+  cops_format = MOBILE_OPERATOR_FORMAT;
+#endif
+
+
   if (owlModem != 0) return true;
 
   pinMode(ANALOG_RND_PIN, INPUT);
@@ -153,7 +165,7 @@ bool Breakout::initModem() {
   LOG(L_NOTICE, ".. OwlModem - now powered on - initializing\r\n");
 
   /* Initialize modem configuration to something we can trust. */
-  if (!owlModem->initModem(TESTING_VARIANT_INIT, TESTING_APN)) {
+  if (!owlModem->initModem(TESTING_VARIANT_INIT, TESTING_APN, cops, cops_format)) {
     LOG(L_NOTICE, "..   - failed initializing modem! - resetting in 30 seconds\r\n");
     delay(30000);
     goto error_stop;
