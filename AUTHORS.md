@@ -8,3 +8,4 @@ We'd like to thank the following people who have contributed to the
 - Dragos Vingarzan <dvingarzan@twilio.com>
 - Valentin Vlad <vvlad@twilio.com>
 - Thomas Wilsher <twilsher@twilio.com>
+- Anton Gerasimov <agerasimov@twilio.com>
