@@ -25,9 +25,7 @@
 
 #include "massive-sdk/src/modem/OwlModemRN4.h"
 #include "CLI/OwlModemCLI.h"
-#include "massive-sdk/src/CoAP/CoAPPeer.h"
 #include "platform/ArduinoSeeedOwlSerial.h"
-
 
 /* Modem result buffer */
 #define MODEM_RESULT_LEN 256
@@ -118,20 +116,7 @@ void loop() {
   /* Important step - handling UDP data */
   owlModem->socket.handleWaitingData();
 
-  /* Take care of DTLS retransmissions */
-  //  owlDTLSClient.triggerPeriodicRetransmit();
-
-  /* Take care of CoAP retransmissions */
-  CoAPPeer::triggerPeriodicRetransmit();
-
   delay(50);
-
-
-  //  test_modem_bypass();
-
-  //  test_modem_get_info();
-
-  //  test_modem_network_management();
 }
 
 
