@@ -126,8 +126,7 @@ class RawGNSSBypass : public OwlModemCLIExecutor {
 
 class PowerOn : public OwlModemCLIExecutor {
  public:
-  PowerOn()
-      : OwlModemCLIExecutor("powerOn", "Power on module\r\n") {
+  PowerOn() : OwlModemCLIExecutor("powerOn", "Power on module\r\n") {
   }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
@@ -140,8 +139,7 @@ class PowerOn : public OwlModemCLIExecutor {
 
 class PowerOff : public OwlModemCLIExecutor {
  public:
-  PowerOff()
-      : OwlModemCLIExecutor("powerOff", "Power on module\r\n") {
+  PowerOff() : OwlModemCLIExecutor("powerOff", "Power on module\r\n") {
   }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
@@ -1816,13 +1814,13 @@ class BreakoutReceiveCommand : public OwlModemCLIExecutor {
       LOG(L_CLI, "ERROR - Breakout not initialized\r\n");
       return;
     }
-    size_t size                = 0;
-    bool isBinary              = false;
+    size_t size   = 0;
+    bool isBinary = false;
 
     static char command_buffer[1024];
-    str command_str = {.s = command_buffer, .len = 0};
+    str command_str            = {.s = command_buffer, .len = 0};
     command_status_code_e code = breakout->receiveCommand(1024, command_buffer, &size, &isBinary);
-    command_str.len               = size;
+    command_str.len            = size;
     switch (code) {
       case COMMAND_STATUS_OK:
         if (isBinary) {
@@ -2051,7 +2049,7 @@ int OwlModemCLI::handleUserInput(int resume) {
   if (!resume) {
     // flush debug port on startup
     while (debugPort->available()) {
-      debugPort->read((uint8_t*) &c, 1);
+      debugPort->read((uint8_t *)&c, 1);
     }
     LOGF(L_CLI, "\r\n");
     LOGF(L_CLI, "Welcome to the OwlModem simple CLI interface!\r\n");
@@ -2067,7 +2065,7 @@ int OwlModemCLI::handleUserInput(int resume) {
     command.len = 0;
   }
   while (debugPort->available()) {
-    debugPort->read((uint8_t*) &c, 1);
+    debugPort->read((uint8_t *)&c, 1);
     switch (c) {
       case '\n':
       case '\r':
@@ -2119,8 +2117,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           } else if (str_equalcase_prefix_char(command, "AT")) {
             /* AT<something> */
             command.s[command.len >= MODEM_CLI_CMD_LEN ? MODEM_CLI_CMD_LEN - 1 : command.len] = 0;
-            at_result_code_e result_code =
-                owlModem->AT.doCommandBlocking(command.s, 30 * 1000, &response);
+            at_result_code_e result_code = owlModem->AT.doCommandBlocking(command.s, 30 * 1000, &response);
             if (!response.len)
               LOGF(L_CLI, " Command [%.*s] returned with result code %s (%d)\r\n", command.len, command.s,
                    at_result_code_text(result_code), result_code);
@@ -2210,7 +2207,7 @@ int OwlModemCLI::handleUserInput(int resume) {
 
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write((uint8_t*) &c, 1);
+          debugPort->write((uint8_t *)&c, 1);
         }
         break;
 
@@ -2240,7 +2237,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           }
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write((uint8_t*) &c, 1);
+          debugPort->write((uint8_t *)&c, 1);
         }
         break;
 
@@ -2250,7 +2247,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           command.len -= 2;
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write((uint8_t*) &c, 1);
+          debugPort->write((uint8_t *)&c, 1);
         }
         break;
 
@@ -2260,7 +2257,7 @@ int OwlModemCLI::handleUserInput(int resume) {
           command.len -= 2;
         } else {
           if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-          debugPort->write((uint8_t*) &c, 1);
+          debugPort->write((uint8_t *)&c, 1);
         }
         break;
       default:
@@ -2268,7 +2265,7 @@ int OwlModemCLI::handleUserInput(int resume) {
         //          SerialUSB.print((int)c);
         //          SerialUSB.print(")");
         if (command.len < MODEM_CLI_CMD_LEN) command.s[command.len++] = c;
-        debugPort->write((uint8_t*) &c, 1);
+        debugPort->write((uint8_t *)&c, 1);
     }
   }
 

@@ -53,10 +53,10 @@ void setup() {
   owl_log_set_level(L_INFO);
   LOG(L_NOTICE, "Arduino setup() starting up\r\n");
 
-  debug_serial = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
+  debug_serial  = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
   module_serial = new ArduinoSeeedHwOwlSerial(&SerialModule, SerialModule_Baudrate);
-  owlModem    = new OwlModemRN4(module_serial, debug_serial);
-  owlModemCLI = new OwlModemCLI(owlModem, debug_serial);
+  owlModem      = new OwlModemRN4(module_serial, debug_serial);
+  owlModemCLI   = new OwlModemCLI(owlModem, debug_serial);
 
   LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - powering on modules\r\n");
   if (!owlModem->powerOn()) {
