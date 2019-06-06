@@ -25,6 +25,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "massive-sdk/src/CoAP/CoAPPeer.h"
 #include "massive-sdk/src/DTLS/OwlDTLSClient.h"

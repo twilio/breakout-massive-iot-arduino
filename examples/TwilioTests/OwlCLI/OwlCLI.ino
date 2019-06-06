@@ -61,7 +61,7 @@ void setup() {
   LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - powering on modules\r\n");
   if (!owlModem->powerOn()) {
     LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to power on\r\n");
-    goto error_stop;
+    return;
   }
   LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - now powered on.\r\n");
 
@@ -82,7 +82,7 @@ void setup() {
   if (!owlModem->initModem(TESTING_VARIANT_INIT, TESTING_APN, cops, cops_format)) {
     LOG(L_NOTICE, "..   - failed initializing modem! - resetting in 30 seconds\r\n");
     delay(30000);
-    goto error_stop;
+    return;
   }
   LOG(L_NOTICE, ".. OwlModem - initialization successfully completed\r\n");
 
@@ -95,7 +95,7 @@ void setup() {
 
   if (!owlModem->waitForNetworkRegistration("devkit", TESTING_VARIANT_REG)) {
     LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to register to the network\r\n");
-    goto error_stop;
+    return;
   }
   LOG(L_NOTICE, ".. OwlModem - registered to network\r\n");
 
@@ -103,15 +103,6 @@ void setup() {
 
   LOG(L_NOTICE, "Arduino setup() done\r\n");
   LOG(L_NOTICE, "Arduino loop() starting\r\n");
-  return;
-error_stop:
-  // TODO - find something which does work on this board to software reset it
-  //    (softwareResetFunc)();
-  //  LOG(L_NOTICE, "TODO - try to find a way to software-reset the board. Until then, you are in bypass mode now\r\n");
-  //  while (1) {
-  //    owlModem->bypass();
-  //    delay(100);
-  //  }
   return;
 }
 
