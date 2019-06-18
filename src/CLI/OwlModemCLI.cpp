@@ -729,7 +729,8 @@ class ConnectSocket : public OwlModemCLIExecutor {
                             "Connect a UDP or TCP socket to a remote IP:port.", 3, 3) {
   }
 
-  static void handlerSocketClosed(uint8_t socket) {
+  static void handlerSocketClosed(uint8_t socket, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "Closed socket event for socket=%d\r\n", socket);
   }
@@ -935,7 +936,8 @@ class ListenUDP : public OwlModemCLIExecutor {
                             "Sets the handler to the CLI test one and listens for incoming UDP packets.", 2, 2) {
   }
 
-  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data) {
+  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "Received UDP data from socket=%d remote_ip=%.*s remote_port=%u of %d bytes\r\n", socket, remote_ip.len,
          remote_ip.s, remote_port, data.len);
@@ -960,7 +962,8 @@ class ListenTCP : public OwlModemCLIExecutor {
                             "Sets the handler to the CLI test one and listens for incoming UDP packets.", 2, 2) {
   }
 
-  static void handlerTCPData(uint8_t socket, str data) {
+  static void handlerTCPData(uint8_t socket, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerTCPData socket=%d len=%d\r\n", socket, data.len);
     LOGSTR(L_CLI, data);
@@ -970,7 +973,7 @@ class ListenTCP : public OwlModemCLIExecutor {
     uint8_t socket      = (uint8_t)str_to_uint32_t(cmd.argv[0], 10);
     uint16_t local_port = (uint16_t)str_to_uint32_t(cmd.argv[1], 10);
     ListenTCP::savedCLI = &cli;
-    if (cli.owlModem->socket.listenTCP(socket, local_port, this->handlerTCPData))
+    if (cli.owlModem->socket.listenTCP(socket, this->handlerTCPData))
       LOGF(L_CLI, "OK\r\n");
     else
       LOGF(L_CLI, "ERROR\r\n");
@@ -987,7 +990,8 @@ class AcceptTCP : public OwlModemCLIExecutor {
   }
 
   static void handlerTCPAccept(uint8_t new_socket, str remote_ip, uint16_t remote_port, uint8_t listening_socket,
-                               str local_ip, uint16_t local_port) {
+                               str local_ip, uint16_t local_port, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI,
          "URC handlerTCPAccept listening_socket=%u local_ip=%.*s local_port=%u new_socket=%u remote_ip=%.*s "
@@ -995,12 +999,14 @@ class AcceptTCP : public OwlModemCLIExecutor {
          listening_socket, local_ip.len, local_ip.s, local_port, new_socket, remote_ip.len, remote_ip.s, remote_port);
   }
 
-  static void handlerSocketClosed(uint8_t socket) {
+  static void handlerSocketClosed(uint8_t socket, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerSocketClosed socket=%d\r\n", socket);
   }
 
-  static void handlerTCPData(uint8_t socket, str data) {
+  static void handlerTCPData(uint8_t socket, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerTCPData socket=%d len=%d\r\n", socket, data.len);
     LOGSTR(L_CLI, data);
@@ -1028,7 +1034,8 @@ class OpenSocketListenUDP : public OwlModemCLIExecutor {
             1, 1) {
   }
 
-  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data) {
+  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerUDPData socket=%u remote_ip=%.*s remote_port=%u len=%d\r\n", socket, remote_ip.len,
          remote_ip.s, remote_port, data.len);
@@ -1039,7 +1046,7 @@ class OpenSocketListenUDP : public OwlModemCLIExecutor {
     uint16_t local_port           = (uint16_t)str_to_uint32_t(cmd.argv[0], 10);
     uint8_t socket                = 0;
     OpenSocketListenUDP::savedCLI = &cli;
-    if (cli.owlModem->socket.openListenUDP(local_port, this->handlerUDPData, &socket))
+    if (cli.owlModem->socket.openListenUDP(local_port, &socket, this->handlerUDPData))
       LOGF(L_CLI, "OK socket=%u\r\n", socket);
     else
       LOGF(L_CLI, "ERROR\r\n");
@@ -1055,7 +1062,8 @@ class OpenSocketListenConnectUDP : public OwlModemCLIExecutor {
                             3, 3) {
   }
 
-  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data) {
+  static void handlerUDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerUDPData socket=%u len=%d\r\n", socket, data.len);
     LOGSTR(L_CLI, data);
@@ -1067,7 +1075,7 @@ class OpenSocketListenConnectUDP : public OwlModemCLIExecutor {
     uint16_t remote_port                 = (uint16_t)str_to_uint32_t(cmd.argv[2], 10);
     uint8_t socket                       = 0;
     OpenSocketListenConnectUDP::savedCLI = &cli;
-    if (cli.owlModem->socket.openListenConnectUDP(local_port, remote_ip, remote_port, this->handlerUDPData, &socket))
+    if (cli.owlModem->socket.openListenConnectUDP(local_port, remote_ip, remote_port, &socket, this->handlerUDPData))
       LOGF(L_CLI, "OK socket=%u\r\n", socket);
     else
       LOGF(L_CLI, "ERROR\r\n");
@@ -1083,12 +1091,14 @@ class OpenSocketListenConnectTCP : public OwlModemCLIExecutor {
                             3, 3) {
   }
 
-  static void handlerSocketClosed(uint8_t socket) {
+  static void handlerSocketClosed(uint8_t socket, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerSocketClosed socket=%d\r\n", socket);
   }
 
-  static void handlerTCPData(uint8_t socket, str data) {
+  static void handlerTCPData(uint8_t socket, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerTCPData socket=%u len=%d\r\n", socket, data.len);
     LOGSTR(L_CLI, data);
@@ -1100,8 +1110,8 @@ class OpenSocketListenConnectTCP : public OwlModemCLIExecutor {
     uint16_t remote_port                 = (uint16_t)str_to_uint32_t(cmd.argv[2], 10);
     uint8_t socket                       = 0;
     OpenSocketListenConnectTCP::savedCLI = &cli;
-    if (cli.owlModem->socket.openListenConnectTCP(local_port, remote_ip, remote_port, this->handlerSocketClosed,
-                                                  this->handlerTCPData, &socket))
+    if (cli.owlModem->socket.openListenConnectTCP(local_port, remote_ip, remote_port, &socket,
+                                                  this->handlerSocketClosed, this->handlerTCPData))
       LOGF(L_CLI, "OK socket=%u\r\n", socket);
     else
       LOGF(L_CLI, "ERROR\r\n");
@@ -1118,7 +1128,8 @@ class OpenSocketAcceptTCP : public OwlModemCLIExecutor {
   }
 
   static void handlerTCPAccept(uint8_t new_socket, str remote_ip, uint16_t remote_port, uint8_t listening_socket,
-                               str local_ip, uint16_t local_port) {
+                               str local_ip, uint16_t local_port, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOG(L_NOTICE,
         "URC handlerTCPAccept listening_socket=%u local_ip=%.*s local_port=%u new_socket=%u "
@@ -1126,12 +1137,14 @@ class OpenSocketAcceptTCP : public OwlModemCLIExecutor {
         listening_socket, local_ip.len, local_ip.s, local_port, new_socket, remote_ip.len, remote_ip.s, remote_port);
   }
 
-  static void handlerSocketClosed(uint8_t socket) {
+  static void handlerSocketClosed(uint8_t socket, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerSocketClosed socket=%d\r\n", socket);
   }
 
-  static void handlerTCPData(uint8_t socket, str data) {
+  static void handlerTCPData(uint8_t socket, str data, void *priv) {
+    (void)priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "URC handlerTCPData socket=%u len=%d\r\n", socket, data.len);
     LOGSTR(L_CLI, data);
@@ -1143,8 +1156,8 @@ class OpenSocketAcceptTCP : public OwlModemCLIExecutor {
     uint16_t remote_port          = (uint16_t)str_to_uint32_t(cmd.argv[2], 10);
     uint8_t socket                = 0;
     OpenSocketAcceptTCP::savedCLI = &cli;
-    if (cli.owlModem->socket.openAcceptTCP(local_port, this->handlerTCPAccept, this->handlerSocketClosed,
-                                           this->handlerTCPData, &socket))
+    if (cli.owlModem->socket.openAcceptTCP(local_port, &socket, this->handlerTCPAccept, this->handlerSocketClosed,
+                                           this->handlerTCPData))
       LOGF(L_CLI, "OK socket=%u\r\n", socket);
     else
       LOGF(L_CLI, "ERROR\r\n");
