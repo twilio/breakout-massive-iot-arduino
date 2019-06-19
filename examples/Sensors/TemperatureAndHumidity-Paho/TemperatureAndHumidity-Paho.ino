@@ -13,10 +13,12 @@
 #define MQTT_BROKER_HOST "10.64.95.217"
 #define MQTT_BROKER_PORT 12345
 #define MQTT_CLIENT_ID "arduino-paho-temperature"
+#define MQTT_TOPIC "temperature"
 #define MQTT_LOGIN NULL
 #define MQTT_PASSWORD NULL
 
 OwlModemRN4 *rn4_modem                               = nullptr;
+ArduinoSeeedUSBOwlSerial *debug_serial               = nullptr;
 ArduinoSeeedHwOwlSerial *modem_serial                = nullptr;
 RN4PahoIPStack *ip_stack                             = nullptr;
 MQTT::Client<RN4PahoIPStack, Countdown> *paho_client = nullptr;
@@ -99,8 +101,9 @@ void setup() {
   owl_log_set_level(L_INFO);
   LOG(L_WARN, "Arduino setup() starting up\r\n");
 
+  debug_serial = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
   modem_serial = new ArduinoSeeedHwOwlSerial(&SerialModule, SerialModule_Baudrate);
-  rn4_modem    = new OwlModemRN4(modem_serial);
+  rn4_modem    = new OwlModemRN4(modem_serial, debug_serial);
 
   LOG(L_WARN, "Powering on module...");
   if (!rn4_modem->powerOn()) {
@@ -127,7 +130,7 @@ void setup() {
   LOG(L_WARN, "... done initializing.\r\n");
 
   LOG(L_WARN, "Waiting for network registration...");
-  if (!rn4_modem->waitForNetworkRegistration("wut?", TESTING_VARIANT_REG)) {
+  if (!rn4_modem->waitForNetworkRegistration("Telemetry", TESTING_VARIANT_REG)) {
     LOG(L_WARN, "... error registering on the network.\r\n");
     fail();
   }
@@ -161,7 +164,7 @@ void loop() {
     message.dup        = false;
     message.payload    = commandText;
     message.payloadlen = strlen(commandText);
-    paho_client->publish("temperature", message);
+    paho_client->publish(MQTT_TOPIC, message);
   }
 
   rn4_modem->AT.spin();
