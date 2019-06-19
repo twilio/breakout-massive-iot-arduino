@@ -75,7 +75,7 @@ typedef enum {
 
 
 #define BREAKOUT_IP "54.145.1.94"
-#define TESTING_APN "nb.iot"
+#define TESTING_APN "iot.nb"
 
 #define TESTING_RAW_SOCKET
 
