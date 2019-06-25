@@ -46,6 +46,12 @@
 // Private Key
 #define TLS_PKEY ""
 
+#define LOOP_INTERVAL (200)
+#define SEND_INTERVAL (20 * 1000)
+
+#define SENSOR_PIN (D38)
+#define DHTTYPE DHT11  // DHT 11
+
 // END CONFIGURATION SECTION
 
 OwlModemRN4 *rn4_modem                               = nullptr;
@@ -53,12 +59,6 @@ ArduinoSeeedUSBOwlSerial *debug_serial               = nullptr;
 ArduinoSeeedHwOwlSerial *modem_serial                = nullptr;
 RN4PahoIPStack *ip_stack                             = nullptr;
 MQTT::Client<RN4PahoIPStack, Countdown> *paho_client = nullptr;
-
-#define LOOP_INTERVAL (200)
-#define SEND_INTERVAL (5 * 1000)
-
-#define SENSOR_PIN (D38)
-#define DHTTYPE DHT11  // DHT 11
 
 DHT dht(SENSOR_PIN, DHTTYPE);
 
