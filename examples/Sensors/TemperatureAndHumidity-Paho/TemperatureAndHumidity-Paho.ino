@@ -10,12 +10,43 @@
 // https://github.com/Seeed-Studio/Grove_Temperature_And_Humidity_Sensor
 #include <DHT.h>
 
-#define MQTT_BROKER_HOST "10.64.95.217"
-#define MQTT_BROKER_PORT 12345
-#define MQTT_CLIENT_ID "arduino-paho-temperature"
+// BEGIN CONFIGURATION SECTION
+
+#define MQTT_BROKER_HOST "mqtt.example.com"
+#define MQTT_BROKER_PORT 8883
+#define MQTT_KEEP_ALIVE 0
+#define MQTT_CLIENT_ID "alfa-kit"
 #define MQTT_TOPIC "temperature"
 #define MQTT_LOGIN NULL
 #define MQTT_PASSWORD NULL
+
+#define USE_TLS true
+// TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
+#define TLS_PROFILE_ID 0
+#define TLS_CIPHER_SUITE USECPREF_CIPHER_SUITE_TLS_RSA_WITH_AES_256_CBC_SHA256
+
+// For best results, provide a DER encoded CA root, device certificate and device private key here
+// PEM is supported, but the MD5 calculation will result in the items being updated every time.  If
+// you provide DER encoded items here, the MD5 sums matching the contents of the module will result
+// in fewer NVM writes.
+//
+// Values must be in hex encoded string format (for example, "48656C6C6F20576F726C64" (equivalent to "Hello World"))
+//
+// To convert from PEM to DER into a hex string format as required below:
+//   cat ca.pem | openssl x509 -outform der | xxd -p -u -c 10000
+// To generate a hex string from DER:
+//   cat ca.der | xxd -p -u -c 10000
+
+// CA
+#define TLS_CA ""
+
+// Cert
+#define TLS_CERT ""
+
+// Private Key
+#define TLS_PKEY ""
+
+// END CONFIGURATION SECTION
 
 OwlModemRN4 *rn4_modem                               = nullptr;
 ArduinoSeeedUSBOwlSerial *debug_serial               = nullptr;
@@ -74,7 +105,7 @@ void fail() {
 }
 
 bool mqtt_connect() {
-  if (!ip_stack->connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT, false, 0)) {
+  if (!ip_stack->connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT, USE_TLS, TLS_PROFILE_ID)) {
     LOG(L_WARN, "Failed to establish connection to the broker\r\n");
     return false;
   }
@@ -83,6 +114,9 @@ bool mqtt_connect() {
   MQTTPacket_connectData connect_data = MQTTPacket_connectData_initializer;
   connect_data.MQTTVersion            = 4;
   connect_data.clientID.cstring       = MQTT_CLIENT_ID;
+  if (MQTT_KEEP_ALIVE > 0) {
+    connect_data.keepAliveInterval    = MQTT_KEEP_ALIVE;
+  }
 
   if (paho_client->connect(connect_data) != 0) {
     LOG(L_WARN, "Failed to connect to MQTT broker\r\n");
@@ -95,6 +129,31 @@ bool mqtt_connect() {
   }
 
   return true;
+}
+
+void mqtt_disconnect() {
+  LOG(L_INFO, "Disconnecting mqtt client and ip stack\r\n");
+  if (paho_client) {
+    paho_client->disconnect();
+    paho_client = nullptr;
+  }
+
+  if (ip_stack) {
+    ip_stack->disconnect();
+  }
+}
+
+void configure_tls() {
+  str ca_hex = STRDECL(TLS_CA);
+  rn4_modem->ssl.setServerCA(ca_hex);
+
+  str cert_hex = STRDECL(TLS_CERT);
+  rn4_modem->ssl.setDeviceCert(cert_hex);
+
+  str key_hex = STRDECL(TLS_PKEY);
+  rn4_modem->ssl.setDevicePkey(key_hex);
+
+  rn4_modem->ssl.initContext(TLS_PROFILE_ID, TLS_CIPHER_SUITE);
 }
 
 void setup() {
@@ -136,6 +195,10 @@ void setup() {
   }
   LOG(L_WARN, "... done waiting.\r\n");
 
+  if (USE_TLS) {
+    configure_tls();
+  }
+
   ip_stack = new RN4PahoIPStack(&rn4_modem->socket);
 
   mqtt_connect();
@@ -148,7 +211,9 @@ void loop() {
 
   if ((last_send == 0) || (millis() - last_send >= SEND_INTERVAL)) {
     if (!ip_stack->connected()) {
-      mqtt_connect();
+      if (mqtt_connect() != 1) {
+        LOG(L_WARN, "Connection failed\r\n");
+      }
       return;
     }
     last_send = millis();
@@ -164,10 +229,16 @@ void loop() {
     message.dup        = false;
     message.payload    = commandText;
     message.payloadlen = strlen(commandText);
-    paho_client->publish(MQTT_TOPIC, message);
+    int rc = paho_client->publish(MQTT_TOPIC, message);
+    if (rc != 0) {
+      LOG(L_WARN, "Error publishing message: %d (client connected: %d)\r\n", rc, paho_client->isConnected());
+    }
   }
 
   rn4_modem->AT.spin();
 
-  paho_client->yield(LOOP_INTERVAL);
+  if ((paho_client != nullptr) && (paho_client->yield(LOOP_INTERVAL) != 0)) {
+      LOG(L_WARN, "Yield returned error - likely disconnected now: %d\r\n", paho_client->isConnected());
+      mqtt_disconnect();
+  }
 }
