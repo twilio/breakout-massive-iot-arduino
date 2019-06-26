@@ -14,9 +14,6 @@
 #ifndef BREAKOUT_CONFIG_H_
 #define BREAKOUT_CONFIG_H_
 
-#include "board.h"
-#include "system_config.h"
-#include "massive-sdk/src/modem/enums.h"
 #include "tls_credentials.h"
 
 #if defined(TLS_DEVICE_CERT) && defined(TLS_DEVICE_PKEY) && defined(TLS_SERVER_CA)
@@ -29,7 +26,8 @@
 #define MQTT_BROKER_PORT 8883
 #define MQTT_KEEP_ALIVE 0
 #define MQTT_CLIENT_ID "alfa-kit"
-#define MQTT_TOPIC "temperature"
+#define MQTT_PUBLISH_TOPIC "temperature"
+#define MQTT_STATE_TOPIC "state"
 #define MQTT_LOGIN NULL
 #define MQTT_PASSWORD NULL
 

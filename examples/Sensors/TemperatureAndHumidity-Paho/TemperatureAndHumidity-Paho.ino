@@ -1,14 +1,15 @@
-#include <config.h>
-#include <massive-sdk/src/modem/OwlModemRN4.h>
-#include <MQTTClient.h>
+#include <BreakoutSDK.h>
 #include <Countdown.h>
 // https://github.com/eclipse/paho.mqtt.embedded-c
+#include <MQTTClient.h>
 #include <massive-sdk/src/shims/paho-mqtt/RN4PahoIPStack.h>
 #include <platform/ArduinoSeeedOwlSerial.h>
 #include <stdio.h>
 
 // https://github.com/Seeed-Studio/Grove_Temperature_And_Humidity_Sensor
 #include <DHT.h>
+
+#include "config.h"
 
 // BEGIN CONFIGURATION SECTION
 
@@ -89,7 +90,7 @@ bool mqtt_connect() {
     return false;
   }
 
-  if (paho_client->subscribe("state", MQTT::QOS0, device_state_callback) != 0) {
+  if (paho_client->subscribe(MQTT_STATE_TOPIC, MQTT::QOS0, device_state_callback) != 0) {
     LOG(L_WARN, "Failed to subscribe to \"state\" topic\r\n");
     return false;
   }
@@ -109,6 +110,7 @@ void mqtt_disconnect() {
   }
 }
 
+#if USE_TLS
 void configure_tls() {
   str ca = {.s = TLS_SERVER_CA, .len = sizeof(TLS_SERVER_CA) -1};
   rn4_modem->ssl.setServerCA(ca);
@@ -121,6 +123,7 @@ void configure_tls() {
 
   rn4_modem->ssl.initContext(TLS_PROFILE_ID, TLS_CIPHER_SUITE);
 }
+#endif
 
 void setup() {
   owl_log_set_level(L_INFO);
@@ -161,9 +164,9 @@ void setup() {
   }
   LOG(L_WARN, "... done waiting.\r\n");
 
-  if (USE_TLS) {
+#if USE_TLS
     configure_tls();
-  }
+#endif
 
   ip_stack = new RN4PahoIPStack(&rn4_modem->socket);
 
@@ -175,7 +178,7 @@ void setup() {
 void loop() {
   static unsigned long last_send = 0;
 
-  if ((last_send == 0) || (millis() - last_send >= SEND_INTERVAL)) {
+  if (!sleep && ((last_send == 0) || (millis() - last_send >= SEND_INTERVAL))) {
     if (!ip_stack->connected()) {
       if (mqtt_connect() != 1) {
         LOG(L_WARN, "Connection failed\r\n");

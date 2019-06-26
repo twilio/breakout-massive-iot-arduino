@@ -20,9 +20,12 @@
 // you provide DER encoded items here, the MD5 sums matching the contents of the module will result
 // in fewer NVM writes.
 //
-// To generate this file from *.pem or *.der files, use the script in the 'scripts' directory:
+// To generate this file from *.pem or *.der files, use the script in the 'scripts' directory of the
+// library or https://github.com/twilio/Breakout_Massive_SDK_Arduino/scripts/ :
 //
-//   ./scripts/make_tls_credentials.sh cert.pem pkey.pem ca.pem > src/tls_credentials.h
+//   ./make_tls_credentials.sh cert.pem pkey.pem ca.pem
+//
+// And copy/paste the results below.
 
 //#define TLS_SERVER_CA "\x00\x01\x02..."
 

@@ -20,6 +20,10 @@
 #ifndef _BREAKOUT_SDK_H
 #define _BREAKOUT_SDK_H
 
+#include "board.h"
+#include "system_config.h"
+#include "massive-sdk/src/modem/enums.h"
+
 #include "massive-sdk/src/modem/OwlModemRN4.h"
 #include "massive-sdk/src/modem/OwlModemBG96.h"
 
