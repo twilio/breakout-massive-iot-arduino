@@ -198,7 +198,7 @@ void loop() {
     message.dup        = false;
     message.payload    = commandText;
     message.payloadlen = strlen(commandText);
-    int rc = paho_client->publish(MQTT_TOPIC, message);
+    int rc = paho_client->publish(MQTT_PUBLISH_TOPIC, message);
     if (rc != 0) {
       LOG(L_WARN, "Error publishing message: %d (client connected: %d)\r\n", rc, paho_client->isConnected());
     }
