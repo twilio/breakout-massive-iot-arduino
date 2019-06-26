@@ -1,20 +1,10 @@
 /*
- * board.h
- * Twilio Breakout SDK
  *
- * Copyright (c) 2018 Twilio, Inc.
+ * Twilio Breakout Massive SDK
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (c) 2019 Twilio, Inc.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier:  Apache-2.0
  */
 
 /**
@@ -25,11 +15,10 @@
  */
 
 
-#ifndef _OWL_BOARD_H_
-#define _OWL_BOARD_H_
+#ifndef BREAKOUT_BOARD_H_
+#define BREAKOUT_BOARD_H_
 
 #include "Arduino.h"
-
 
 #define SerialGrove Serial         // UART1
 #define SerialModule Serial1       // UART2
@@ -63,20 +52,10 @@ typedef enum {
   RESET_MODULE_PIN = 35,  // PC3
   PWR_KEY_PIN      = 36,  // PC4
 
+  BG96_RESET_PIN   = 19,  // PB3, Grove DC pin
+
   ANALOG_RND_PIN = 7,  // PA7 - this port was picked because it's not connected, so random source - but it
                        // is unfortunately on Grove A6 port, so if used, change this maybe
-  BG96_RESET_PIN   = 19,   // PB3, Grove DC pin
 } board_pin_e;
 
-
-
-#define TESTING_VARIANT_INIT 0
-#define TESTING_VARIANT_REG 0
-
-
-#define BREAKOUT_IP "54.145.1.94"
-#define TESTING_APN "iot.nb"
-
-#define TESTING_RAW_SOCKET
-
-#endif
+#endif // BREAKOUT_BOARD_H_

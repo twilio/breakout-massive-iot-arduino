@@ -1,4 +1,4 @@
-#include <board.h>
+#include <config.h>
 #include <massive-sdk/src/modem/OwlModemRN4.h>
 #include <MQTTClient.h>
 #include <Countdown.h>
@@ -11,40 +11,6 @@
 #include <DHT.h>
 
 // BEGIN CONFIGURATION SECTION
-
-#define MQTT_BROKER_HOST "mqtt.example.com"
-#define MQTT_BROKER_PORT 8883
-#define MQTT_KEEP_ALIVE 0
-#define MQTT_CLIENT_ID "alfa-kit"
-#define MQTT_TOPIC "temperature"
-#define MQTT_LOGIN NULL
-#define MQTT_PASSWORD NULL
-
-#define USE_TLS true
-// TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
-#define TLS_PROFILE_ID 0
-#define TLS_CIPHER_SUITE USECPREF_CIPHER_SUITE_TLS_RSA_WITH_AES_256_CBC_SHA256
-
-// For best results, provide a DER encoded CA root, device certificate and device private key here
-// PEM is supported, but the MD5 calculation will result in the items being updated every time.  If
-// you provide DER encoded items here, the MD5 sums matching the contents of the module will result
-// in fewer NVM writes.
-//
-// Values must be in hex encoded string format (for example, "48656C6C6F20576F726C64" (equivalent to "Hello World"))
-//
-// To convert from PEM to DER into a hex string format as required below:
-//   cat ca.pem | openssl x509 -outform der | xxd -p -u -c 10000
-// To generate a hex string from DER:
-//   cat ca.der | xxd -p -u -c 10000
-
-// CA
-#define TLS_CA ""
-
-// Cert
-#define TLS_CERT ""
-
-// Private Key
-#define TLS_PKEY ""
 
 #define LOOP_INTERVAL (200)
 #define SEND_INTERVAL (20 * 1000)
@@ -144,14 +110,14 @@ void mqtt_disconnect() {
 }
 
 void configure_tls() {
-  str ca_hex = STRDECL(TLS_CA);
-  rn4_modem->ssl.setServerCA(ca_hex);
+  str ca = {.s = TLS_SERVER_CA, .len = sizeof(TLS_SERVER_CA) -1};
+  rn4_modem->ssl.setServerCA(ca);
 
-  str cert_hex = STRDECL(TLS_CERT);
-  rn4_modem->ssl.setDeviceCert(cert_hex);
+  str cert = {.s = TLS_DEVICE_CERT, .len = sizeof(TLS_DEVICE_CERT) -1};
+  rn4_modem->ssl.setDeviceCert(cert);
 
-  str key_hex = STRDECL(TLS_PKEY);
-  rn4_modem->ssl.setDevicePkey(key_hex);
+  str key = {.s = TLS_DEVICE_PKEY, .len = sizeof(TLS_DEVICE_PKEY) -1};
+  rn4_modem->ssl.setDevicePkey(key);
 
   rn4_modem->ssl.initContext(TLS_PROFILE_ID, TLS_CIPHER_SUITE);
 }
