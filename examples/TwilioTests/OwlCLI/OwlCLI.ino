@@ -21,9 +21,8 @@
  * \file OwlModemTest.ino - Example for testing out functionality of the modem.
  */
 
-#include <board.h>
+#include <BreakoutSDK.h>
 
-#include "massive-sdk/src/modem/OwlModemRN4.h"
 #include "CLI/OwlModemCLI.h"
 #include "platform/ArduinoSeeedOwlSerial.h"
 
