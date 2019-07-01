@@ -5,7 +5,7 @@
 class ArduinoSeeedUSBOwlSerial : public IOwlSerial {
  public:
   ArduinoSeeedUSBOwlSerial(USBSerial *serial) : serial_(serial) {
-    if (serial_ != nullptr) serial_->enableBlockingTx();
+    if (serial_ != nullptr) serial_->enableSmartBlockingTx(3*1000);
   }
   virtual ~ArduinoSeeedUSBOwlSerial() {
     if (serial_) serial_->end();
