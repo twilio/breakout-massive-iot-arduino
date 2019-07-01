@@ -26,7 +26,7 @@
 #define SerialDebugPort SerialUSB  // USB port
 
 #define SerialModule_Baudrate 115200
-#define SerialGNSS_BAUDRATE 9600
+#define SerialGNSS_Baudrate 9600
 #define BG96_Baudrate 9600
 
 /**
