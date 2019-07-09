@@ -15,17 +15,41 @@
 #ifndef TLS_CREDENTIALS_H_
 #define TLS_CREDENTIALS_H_
 
-// For best results, provide a DER encoded CA root, device certificate and device private key here
-// PEM is supported, but the MD5 calculation will result in the items being updated every time.  If
-// you provide DER encoded items here, the MD5 sums matching the contents of the module will result
-// in fewer NVM writes.
-//
-// To generate this file from *.pem or *.der files, use the script in the 'scripts' directory of the
-// library or https://github.com/twilio/Breakout_Massive_SDK_Arduino/scripts/ :
+// You can provide either ASCII PEM encoded certificates and a private key below, or hex escaped 
+// DER encoded items.  The benefit of providing ASCII PEM is ease to copy/paste in and readability.
+// The benefit of providing hex escaped DER items is less flash storage required and no runtime 
+// base64 decoding when comparing the MD5 sums before writing to the module.  In either case, choose
+// the section below best for your needs and remove the comment designators.
+
+
+// To provide PEM encoded items, use the openssl command line or another tool to convert, if needed,
+// the trusted CA root, device cert and private key and paste below - observing the required header/footer
+// and ""\ format.
+
+//#define TLS_DEVICE_CERT "" \
+//"-----BEGIN CERTIFICATE-----" \
+//"..." \
+//"-----END CERTIFICATE-----"
+
+//#define TLS_DEVICE_PKEY "" \
+//"-----BEGIN RSA PRIVATE KEY-----" \
+//"..." \
+//"-----END RSA PRIVATE KEY-----"
+
+//#define TLS_SERVER_CA "" \
+//"-----BEGIN CERTIFICATE-----" \
+//"..." \
+//"-----END CERTIFICATE-----"
+//#endif
+
+
+// To provide DER encoded items, a help script is provided.  To generate this file from *.pem or *.der
+// files, use the script in the 'scripts' directory of the library or
+// https://github.com/twilio/Breakout_Massive_SDK_Arduino/scripts/ : 
 //
 //   ./make_tls_credentials.sh cert.pem pkey.pem ca.pem
 //
-// And copy/paste the results below.
+// And copy/paste the results below, see the commented out lines with \x00\x01\x02...
 
 //#define TLS_SERVER_CA "\x00\x01\x02..."
 
