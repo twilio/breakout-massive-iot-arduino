@@ -1184,6 +1184,25 @@ class GetGNSSData : public OwlModemCLIExecutor {
 
 #define MAX_COMMANDS 90
 
+class SSLInitializeContext: public OwlModemCLIExecutor {
+  public:
+    SSLInitializeContext() : OwlModemCLIExecutor("ssl.initializeContext", "[<context> [<cipher_suite>]]",
+        "Initializes the SSL context",
+        0, 2) {}
+
+  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
+    uint8_t context = 0;
+    usecprf_cipher_suite_e cipher_suite = USECPREF_CIPHER_SUITE_TLS_RSA_WITH_AES_256_CBC_SHA256;
+    if (cmd.argc >= 1) context = (uint8_t)str_to_long_int(cmd.argv[1], 10);
+    if (cmd.argc >= 2) context = (usecprf_cipher_suite_e)str_to_long_int(cmd.argv[2], 10);
+    if (cli.owlModem->ssl.initContext(context, cipher_suite))
+      LOGF(L_CLI, "OK context initialized\r\n");
+    else
+      LOGF(L_CLI, "ERROR\r\n");
+  }
+};
+
+
 OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   this->owlModem  = modem;
   this->debugPort = debug_port;
@@ -1262,6 +1281,8 @@ OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   executors[cnt++] = owl_new OpenSocketAcceptTCP();
 
   executors[cnt++] = owl_new GetGNSSData();
+
+  executors[cnt++] = owl_new SSLInitializeContext();
 
   executors[cnt++] = 0;
   if (cnt > MAX_COMMANDS) {
