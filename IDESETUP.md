@@ -1,5 +1,5 @@
 # Twilio Breakout SDK Environment Setup
-This page documents how to get started using the Breakout SDK and what it provides. Today, the Breakout SDK is built for the STM32F405RG MCU and U-Blox Sara-N410 cellular module in mind. This specific Developer Board was provided in Twilio's Alfa Developer Kit and distributed to [SIGNAL 2018](https://www.twilio.com/signal) attendees, and it came with Grove sensors – humidity, light, and ultrasonic.
+This page documents how to get started using the Breakout SDK and what it provides. Today, the Breakout SDK is built for the STM32F405RG MCU and U-Blox Sara-N410 cellular module in mind. This specific Developer Board was provided in Twilio's Alfa Developer Kit and distributed to [SIGNAL](https://www.twilio.com/signal) attendees, and it came with Grove sensors – humidity, light, and ultrasonic distance.
 
 ## Alfa Developer Kit
 <p align="center">
@@ -12,7 +12,7 @@ This page documents how to get started using the Breakout SDK and what it provid
 - Alfa Developer Board
 - LTE antenna
 - GPS antenna
-- 3 Grove sensors:
+- 3 Grove components:
     1. Button
     2. Ultrasonic
     3. Temperature/Humidity
@@ -59,6 +59,21 @@ The following step is required for OSX:
 The follow steps are required for Windows:
 1.  [Install USB Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#install-usb-driver)
 
+##### Ubuntu
+
+1. Install an updated dfu-util using apt:
+``` sudo apt-get install dfu-util ```
+2. Configure permissions for USB serial port provided by the Alfa developer board.  Without this, you may face permission issues when flashing the board unless you run dfu-util setuid to root.
+```
+sudo tee -a /etc/udev/rules.d/50-twilio-local.rules << _DONE_
+# Twilio Alfa kit
+# Bus 001 Device 035: ID 0483:5740 STMicroelectronics STM32F407
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", GROUP="dialout", MODE="0666"
+_DONE_
+```
+3. Plug in the developer kit and verify permissions: `ls -l /dev/ttyACM*` the device should be readable and writable by all users.
+``` crw-rw-rw- 1 root dialout 166, 0 Jul  8 16:41 /dev/ttyACM0 ```
+
 ### Arduino IDE Developer Board Installation
 1. Insert the Micro-USB cable into the Developer Board
 2. Insert the other end of the USB cable in your computer
@@ -69,8 +84,7 @@ The follow steps are required for Windows:
 6. Click OK
 7. Click Tools > Boards > Boards Manager
 8. Type "Seeed" into the search field
-9. Select the Seeed STM32F4 Boards version 1.2.3+
-> See [#2 in known limitations and workaround](#limitations-and-workarounds) if you are not using version 1.2.3 or greater.
+9. Select the Seeed STM32F4 Boards version 1.2.5 or later
 10. Click Install
 11. Close the Boards Manager window
 12. Click Tools > Boards > Wio Tracker LTE
@@ -123,7 +137,7 @@ The library will now be present for Arduino IDE to use. To update the library:
 6. Click the RST button when the sketch has finished uploading
 7. Click Tools > Port > **{Your Modem Port Here}**
     * OSX: /dev/{cu|tty}.usbmodem{XXXX}
-    * Linux: /dev/ttyACM{X}
+    * Ubuntu and other Linuxes: /dev/ttyACM{X}
     * Windows: COM{X}
 8. Click Tools > Serial Monitor
 9. Monitor the output of the board in the Serial Monitor window
@@ -152,7 +166,7 @@ The LEDs on the Developer Board are set to function as the following:
  2. Unable to remove lithium battery from Developer Board.
     *  **Problem:** JST pings lock lithium battery into place.
     *  **Solution:**  If the battery is pushed in a touch too far, it locks. Lift the pins from the JST connector and pull on the lithium battery cable. The JST connector has tabs that dig in and are not meant to be disconnected again.
-  3. `No DFU capable USB device available`
+ 3. `No DFU capable USB device available`
       *  **Problem:** Unable to upload firmware. Device is not in DFU mode.
       ```
       DFU begin
