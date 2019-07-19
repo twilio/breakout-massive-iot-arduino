@@ -18,12 +18,13 @@
 
 #if defined(TLS_DEVICE_CERT) && defined(TLS_DEVICE_PKEY) && defined(TLS_SERVER_CA)
 #  define USE_TLS true
+#  define MQTT_BROKER_PORT 8883
 #else
 #  define USE_TLS false
+#  define MQTT_BROKER_PORT 1883
 #endif
 
 #define MQTT_BROKER_HOST "mqtt.example.com"
-#define MQTT_BROKER_PORT 8883
 #define MQTT_KEEP_ALIVE 0
 #define MQTT_CLIENT_ID "alfa-kit"
 #define MQTT_PUBLISH_TOPIC "temperature"
