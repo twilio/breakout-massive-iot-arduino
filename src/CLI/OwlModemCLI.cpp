@@ -75,7 +75,7 @@ class SetDebugLevel : public OwlModemCLIExecutor {
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     int level = str_to_long_int(cmd.argv[0], 10);
     owl_log_set_level(level);
-    LOGF(L_CLI, "OK level=%d\r\n", level);
+    LOGF(L_CLI, "OK level=[%d]\r\n", level);
   }
 };
 
@@ -236,7 +236,7 @@ class GetIndicators : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     if (cli.owlModem->information.getIndicators(&response)) {
-      LOGF(L_CLI, "OK BatteryChargeLevels=[%.*s]\r\n", response.len, response.s);
+      LOGF(L_CLI, "OK Indicators=[%.*s]\r\n", response.len, response.s);
     } else {
       LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
     }
@@ -267,7 +267,7 @@ class GetICCID : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     if (cli.owlModem->SIM.getICCID(&response)) {
-      LOGF(L_CLI, "OK ICCID=%.*s\r\n", response.len, response.s);
+      LOGF(L_CLI, "OK ICCID=[%.*s]\r\n", response.len, response.s);
     } else {
       LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
     }
@@ -281,7 +281,7 @@ class GetIMSI : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     if (cli.owlModem->SIM.getIMSI(&response)) {
-      LOGF(L_CLI, "OK IMSI=%.*s\r\n", response.len, response.s);
+      LOGF(L_CLI, "OK IMSI=[%.*s]\r\n", response.len, response.s);
     } else {
       LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
     }
