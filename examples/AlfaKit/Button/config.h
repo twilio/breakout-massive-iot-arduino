@@ -18,18 +18,21 @@
 
 #if defined(TLS_DEVICE_CERT) && defined(TLS_DEVICE_PKEY) && defined(TLS_SERVER_CA)
 #  define USE_TLS true
+#  define MQTT_BROKER_PORT 8883
 #else
 #  define USE_TLS false
+#  define MQTT_BROKER_PORT 1883
 #endif
 
 #define MQTT_BROKER_HOST "mqtt.example.com"
-#define MQTT_BROKER_PORT 8883
 #define MQTT_KEEP_ALIVE 0
 #define MQTT_CLIENT_ID "alfa-kit"
-#define MQTT_PUBLISH_TOPIC "button"
-#define MQTT_STATE_TOPIC "state"
-#define MQTT_LOGIN NULL
-#define MQTT_PASSWORD NULL
+#define MQTT_PUBLISH_TOPIC "device/button"
+#define MQTT_STATE_TOPIC "device/state"
+
+// comment out if you are using certificate or anonymous authentication
+#define MQTT_LOGIN "login"
+#define MQTT_PASSWORD "password"
 
 // TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
 #define TLS_PROFILE_ID 0

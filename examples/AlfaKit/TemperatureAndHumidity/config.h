@@ -28,7 +28,7 @@
 #define MQTT_KEEP_ALIVE 0
 #define MQTT_CLIENT_ID "alfa-kit"
 #define MQTT_PUBLISH_TOPIC "device/temperature"
-#define MQTT_STATE_TOPIC "device/commands"
+#define MQTT_STATE_TOPIC "device/state"
 
 // comment out if you are using certificate or anonymous authentication
 #define MQTT_LOGIN "login"

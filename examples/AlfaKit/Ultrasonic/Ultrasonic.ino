@@ -17,11 +17,15 @@
 
 // END CONFIGURATION SECTION
 
+#define MAX_MQTT_PACKET_SIZE 500
+
 OwlModemRN4 *rn4_modem                               = nullptr;
 ArduinoSeeedUSBOwlSerial *debug_serial               = nullptr;
 ArduinoSeeedHwOwlSerial *modem_serial                = nullptr;
 RN4PahoIPStack *ip_stack                             = nullptr;
-MQTT::Client<RN4PahoIPStack, Countdown> *paho_client = nullptr;
+MQTT::Client<RN4PahoIPStack, Countdown, MAX_MQTT_PACKET_SIZE> *paho_client = nullptr;
+
+str imei = { .s = nullptr, .len = 0 };
 
 Ultrasonic UltrasonicRanger(ULTRASONIC_PIN);
 
@@ -49,7 +53,7 @@ static void device_state_callback(MQTT::MessageData &message) {
     return;
   }
 
-  LOG(L_WARN, "Unknown state: %s\r\n", message.message.payload);
+  LOG(L_WARN, "Unknown state: %.*s\r\n", message_str.len, message_str.s);
 }
 
 void fail() {
@@ -74,10 +78,17 @@ bool mqtt_connect() {
     return false;
   }
 
-  paho_client                         = new MQTT::Client<RN4PahoIPStack, Countdown>(*ip_stack);
+  paho_client                         = new MQTT::Client<RN4PahoIPStack, Countdown, MAX_MQTT_PACKET_SIZE>(*ip_stack);
   MQTTPacket_connectData connect_data = MQTTPacket_connectData_initializer;
   connect_data.MQTTVersion            = 4;
   connect_data.clientID.cstring       = MQTT_CLIENT_ID;
+#ifdef MQTT_LOGIN
+  connect_data.username.cstring       = MQTT_LOGIN;
+#endif
+#ifdef MQTT_PASSWORD
+  connect_data.password.cstring       = MQTT_PASSWORD;
+#endif
+
   if (MQTT_KEEP_ALIVE > 0) {
     connect_data.keepAliveInterval = MQTT_KEEP_ALIVE;
   }
@@ -159,6 +170,10 @@ void setup() {
   }
   LOG(L_WARN, "... done initializing.\r\n");
 
+  str imei_temp = { .s = nullptr, .len = 0};
+  rn4_modem->information.getIMEI(&imei_temp);
+  str_dup(imei, imei_temp);
+
   LOG(L_WARN, "Waiting for network registration...");
   if (!rn4_modem->waitForNetworkRegistration("Telemetry", TESTING_VARIANT_REG)) {
     LOG(L_WARN, "... error registering on the network.\r\n");
@@ -175,6 +190,11 @@ void setup() {
   mqtt_connect();
 
   LOG(L_WARN, "Arduino loop() starting up\r\n");
+ 
+  return;
+
+  out_of_memory:
+  LOG(L_ERR, "Arduino loop() it out of memory\r\n");
 }
 
 bool send_data(char *data) {
@@ -202,16 +222,13 @@ void loop() {
     static bool detected = false;
     if (!detected && distance < 10) {
       detected       = true;
-      char message[] = "Object detected";
-      if (!send_data(message)) {
-        LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
-      }
     } else if (detected && distance > 15) {
       detected       = false;
-      char message[] = "Object lost";
-      if (!send_data(message)) {
-        LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
-      }
+    }
+    char commandText[512];
+    snprintf(commandText, 512, "{\"device\":\"%.*s\",\"object\":\"%s\"}", imei.len, imei.s, (detected ? "detected" : "lost"));
+    if (!send_data(commandText)) {
+      LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
     }
   }
 
