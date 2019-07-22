@@ -27,10 +27,12 @@
 #define MQTT_BROKER_HOST "mqtt.example.com"
 #define MQTT_KEEP_ALIVE 0
 #define MQTT_CLIENT_ID "alfa-kit"
-#define MQTT_PUBLISH_TOPIC "temperature"
-#define MQTT_STATE_TOPIC "state"
-#define MQTT_LOGIN NULL
-#define MQTT_PASSWORD NULL
+#define MQTT_PUBLISH_TOPIC "device/temperature"
+#define MQTT_STATE_TOPIC "device/commands"
+
+// comment out if you are using certificate or anonymous authentication
+#define MQTT_LOGIN "login"
+#define MQTT_PASSWORD "password"
 
 // TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
 #define TLS_PROFILE_ID 0
