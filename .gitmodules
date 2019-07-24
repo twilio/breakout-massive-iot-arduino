@@ -1,3 +1,3 @@
 [submodule "src/massive-sdk"]
-	path = src/massive-sdk
-  url = git@github.com:twilio/Breakout_Massive_SDK.git
+  path = src/massive-sdk
+  url = https://github.com/twilio/Breakout_Massive_SDK.git
