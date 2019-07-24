@@ -6,13 +6,15 @@
 
 board=Seeeduino:Seeed_STM32F4:wioGpsM4
 
+set -e
+
 # Verifying samples
 for x in $(find examples/AlfaKit -name \*ino); do \
   echo "Verifying ${x}..."
-  arduino --verify --board ${board} ${x} || break
+  arduino --verify --board ${board} ${x} || exit 1
 done
 
 for x in $(find examples/BG96 -name \*ino); do \
   echo "Verifying ${x}..."
-  arduino --verify --board ${board} ${x} || break
+  arduino --verify --board ${board} ${x} || exit 1
 done
