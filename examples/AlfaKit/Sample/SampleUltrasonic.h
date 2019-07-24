@@ -21,15 +21,16 @@ void sample_ultrasonic_loop() {
     long distance;
     distance             = UltrasonicRanger.MeasureInCentimeters();
     static bool detected = false;
-    bool old_detected = detected;
+    bool old_detected    = detected;
     if (!detected && distance < 10) {
-      detected       = true;
+      detected = true;
     } else if (detected && distance > 15) {
-      detected       = false;
+      detected = false;
     }
     if (old_detected != detected) {
       char commandText[512];
-      snprintf(commandText, 512, "{\"device\":\"%.*s\",\"object\":\"%s\"}", imei.len, imei.s, (detected ? "detected" : "lost"));
+      snprintf(commandText, 512, "{\"device\":\"%.*s\",\"object\":\"%s\"}", imei.len, imei.s,
+               (detected ? "detected" : "lost"));
       if (!send_data(commandText)) {
         LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
       }

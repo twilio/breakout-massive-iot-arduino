@@ -15,9 +15,9 @@
 #ifndef TLS_CREDENTIALS_H_
 #define TLS_CREDENTIALS_H_
 
-// You can provide either ASCII PEM encoded certificates and a private key below, or hex escaped 
+// You can provide either ASCII PEM encoded certificates and a private key below, or hex escaped
 // DER encoded items.  The benefit of providing ASCII PEM is ease to copy/paste in and readability.
-// The benefit of providing hex escaped DER items is less flash storage required and no runtime 
+// The benefit of providing hex escaped DER items is less flash storage required and no runtime
 // base64 decoding when comparing the MD5 sums before writing to the module.  In either case, choose
 // the section below best for your needs and remove the comment designators.
 
@@ -45,7 +45,7 @@
 
 // To provide DER encoded items, a help script is provided.  To generate this file from *.pem or *.der
 // files, use the script in the 'scripts' directory of the library or
-// https://github.com/twilio/Breakout_Massive_SDK_Arduino/scripts/ : 
+// https://github.com/twilio/Breakout_Massive_SDK_Arduino/scripts/ :
 //
 //   ./make_tls_credentials.sh cert.pem pkey.pem ca.pem
 //
@@ -57,4 +57,4 @@
 
 //#define TLS_DEVICE_PKEY "\x00\x01\x02.."
 
-#endif // TLS_CREDENTIALS_H_
+#endif  // TLS_CREDENTIALS_H_

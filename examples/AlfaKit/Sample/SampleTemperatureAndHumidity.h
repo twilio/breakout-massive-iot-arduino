@@ -17,7 +17,6 @@ DHT dht(SENSOR_PIN, DHTTYPE);
 
 void sample_temperature_humidity_setup() {
   pinMode(SENSOR_PIN, INPUT);
-
 }
 
 void sample_temperature_humidity_loop() {
@@ -30,7 +29,8 @@ void sample_temperature_humidity_loop() {
     last_send = millis();
 
     char commandText[512];
-    snprintf(commandText, 512, "{\"device\":\"%.*s\",\"humidity\":%4.2f,\"temp\":%4.2f}", imei.len, imei.s, humidity, temperature);
+    snprintf(commandText, 512, "{\"device\":\"%.*s\",\"humidity\":%4.2f,\"temp\":%4.2f}", imei.len, imei.s, humidity,
+             temperature);
     if (!send_data(commandText)) {
       LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
     }

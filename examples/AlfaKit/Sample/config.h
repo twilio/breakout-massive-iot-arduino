@@ -44,4 +44,4 @@
 #include "tls_credentials.h"
 #endif
 
-#endif // BREAKOUT_CONFIG_H_
+#endif  // BREAKOUT_CONFIG_H_

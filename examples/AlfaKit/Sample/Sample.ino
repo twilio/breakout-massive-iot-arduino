@@ -12,7 +12,7 @@
 // BEGIN SAMPLE SELECTION SECTION
 
 // These three samples use the same port on the development board, D38, so only one can be used
-// at a time by default.  You can edit the header file to specify D20 to use two of the 
+// at a time by default.  You can edit the header file to specify D20 to use two of the
 // components simultaneously.
 //#include "SampleButton.h"
 #include "SampleTemperatureAndHumidity.h"
@@ -32,7 +32,7 @@ void setup() {
   owl_log_set_level(L_INFO);
 
   modem_setup();
-  mqtt_setup(); 
+  mqtt_setup();
 
   LOG(L_WARN, "Arduino loop() starting up\r\n");
 
@@ -48,7 +48,7 @@ void setup() {
 #ifdef SAMPLE_ULTRASONIC
   sample_ultrasonic_setup();
 #endif
- 
+
   return;
 }
 

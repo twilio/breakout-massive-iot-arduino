@@ -3,11 +3,11 @@
 #include <BreakoutSDK.h>
 #include <platform/ArduinoSeeedOwlSerial.h>
 
-OwlModemRN4 *rn4_modem                               = nullptr;
-ArduinoSeeedUSBOwlSerial *debug_serial               = nullptr;
-ArduinoSeeedHwOwlSerial *modem_serial                = nullptr;
+OwlModemRN4 *rn4_modem                 = nullptr;
+ArduinoSeeedUSBOwlSerial *debug_serial = nullptr;
+ArduinoSeeedHwOwlSerial *modem_serial  = nullptr;
 
-str imei = { .s = nullptr, .len = 0 };
+str imei = {.s = nullptr, .len = 0};
 
 // forward declarations
 void configure_tls();
@@ -48,7 +48,7 @@ void modem_setup() {
   }
   LOG(L_WARN, "... done initializing.\r\n");
 
-  str imei_temp = { .s = nullptr, .len = 0};
+  str imei_temp = {.s = nullptr, .len = 0};
   rn4_modem->information.getIMEI(&imei_temp);
   str_dup(imei, imei_temp);
 

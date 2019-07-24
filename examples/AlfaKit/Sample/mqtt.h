@@ -11,7 +11,7 @@
 // Recommended buffer size defaults
 #define MAX_MQTT_PACKET_SIZE 500
 
-RN4PahoIPStack *ip_stack                             = nullptr;
+RN4PahoIPStack *ip_stack                                                   = nullptr;
 MQTT::Client<RN4PahoIPStack, Countdown, MAX_MQTT_PACKET_SIZE> *paho_client = nullptr;
 
 bool sleep = false;
@@ -53,10 +53,10 @@ bool mqtt_connect() {
   connect_data.MQTTVersion            = 4;
   connect_data.clientID.cstring       = MQTT_CLIENT_ID;
 #ifdef MQTT_LOGIN
-  connect_data.username.cstring       = MQTT_LOGIN;
+  connect_data.username.cstring = MQTT_LOGIN;
 #endif
 #ifdef MQTT_PASSWORD
-  connect_data.password.cstring       = MQTT_PASSWORD;
+  connect_data.password.cstring = MQTT_PASSWORD;
 #endif
 
   if (MQTT_KEEP_ALIVE > 0) {

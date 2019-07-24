@@ -17,7 +17,7 @@ void sample_button_loop() {
   if (!sleep) {
     int buttonState = digitalRead(BUTTON_PIN);
     if (!pressed && buttonState) {
-      pressed             = true;
+      pressed = true;
 
       char commandText[512];
       snprintf(commandText, 512, "{\"device\":\"%.*s\",\"button\":\"pressed\"}", imei.len, imei.s);
