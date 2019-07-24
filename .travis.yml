@@ -1,0 +1,8 @@
+language: cpp
+dist: bionic
+compiler:
+  - clang
+os:
+  - linux
+script:
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./scripts/ci-script-travis.sh; fi'
