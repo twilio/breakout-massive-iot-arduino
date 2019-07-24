@@ -67,13 +67,13 @@ void modem_setup() {
 #ifdef USE_TLS
 void configure_tls() {
 #ifdef USE_CERTIFICATES
-  str ca = {.s = TLS_SERVER_CA, .len = sizeof(TLS_SERVER_CA) - 1};
+  str ca = {.s = TLS_SERVER_CA, .len = sizeof(TLS_SERVER_CA)};
   rn4_modem->ssl.setServerCA(ca);
 
-  str cert = {.s = TLS_DEVICE_CERT, .len = sizeof(TLS_DEVICE_CERT) - 1};
+  str cert = {.s = TLS_DEVICE_CERT, .len = sizeof(TLS_DEVICE_CERT)};
   rn4_modem->ssl.setDeviceCert(cert);
 
-  str key = {.s = TLS_DEVICE_PKEY, .len = sizeof(TLS_DEVICE_PKEY) - 1};
+  str key = {.s = TLS_DEVICE_PKEY, .len = sizeof(TLS_DEVICE_PKEY)};
   rn4_modem->ssl.setDevicePkey(key);
 #endif
 
