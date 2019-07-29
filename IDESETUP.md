@@ -121,11 +121,21 @@ The library will now be present for Arduino IDE to use. To update the library:
 
 ## Flash the Developer Board with sample applications
 1. Open Arduino IDE
-2. Click File > examples and navigate to the Breakout library examples
-3. Select an example from File > Examples > Breakout SDK > Sensors
-  1. Search for `psk_key`
-  2. Insert your PSK in place of `00112233445566778899aabbccddeeff`
-  3. You can find your PSK in the under your [Narrowband SIM Resource](https://twilio.com/console/wireless/sims)
+2. Click File > examples and navigate to the Breakout Arduino Library examples
+3. Select File > Examples > Breakout Arduino Library > AlfaKit > Sample.ino
+4. Several tabs should be open now
+  1.`Sample` is the top-level file, it contains the sketch's [setup()] (https://www.arduino.cc/reference/en/language/structure/sketch/setup/) and [loop()](https://www.arduino.cc/reference/en/language/structure/sketch/loop/) functions. You can uncomment one of the `#include Sample*` directives, to enable a sample using a specific sensor. If you want to customize your sketch, you can do it directly here, or in the included modules.
+  2. `SampleButton.h`, `SampleGPS.h`, `SampleTemperatureAndHumidity.h` and `SampleUltrasonic.h` include the actual code for setting up and running samples using a button, GPS receiver, temperature/humidity sensor and ultrasonic proximity sensor respectively.
+  3. `config.h` is for you to set up your specific application.
+    * change `#undef USE_TLS`, `#undef USE_CERTIFICATES` and/or `#undef USE_USERNAME_PASSWORD` to respective `#define`s to enable TLS, certificates header (see below) and username/password authentication respectively
+    * Set `MQTT_BROKER_HOST` and `MQTT_BROKER_PORT` to the location of your MQTT broker
+    * Change `MQTT_KEEP_ALIVE` to 1 if your broker tends to reset connections on inactivity
+    * Set `MQTT_CLIENT_ID` to whatever you want your client ID to be
+    * Change `MQTT_PUBLISH_TOPIC` and `MQTT_STATE_TOPIC` to the topics you want your sample to be publishing and listening to. If you want to go deeper, you can always define more topics to publish/subscribe to, no need to add them to the `config.h` if you don't want to.
+    * If you are using login/password authentication, set the credentials in `MQTT_LOGIN` and `MQTT_PASSWORD`.
+  4. `tls_credentials.h` is for you to paste your TLS credentials, including device's certificate and private key (`TLS_DEVICE_CERT`, `TLS_DEVICE_PKEY`) and server's certificate authority certificate (`TLS_SERVER_CA`)
+  5. `modem.h` contains service procedures to initialize the modem on the AlfaKit. Refer to it if you're curious about what is happening under the hood.
+  6. `mqtt.h` contains shims to integrate with Paho MQTT client, and publishing/subscribing code. It is what you will want to hack on if you want to create more topics.
 > **Note:** The example ino files are readonly. Save your changes to a new location.
 4. Enable Bootloader mode on the Developer Board: 
 	1. Press and hold the **BOOT0** button underneath the Developer Board
