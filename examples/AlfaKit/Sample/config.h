@@ -14,9 +14,19 @@
 #ifndef BREAKOUT_CONFIG_H_
 #define BREAKOUT_CONFIG_H_
 
-#undef USE_TLS
-#undef USE_CERTIFICATES
-#undef USE_USERNAME_PASSWORD
+// To enable an autentication mechanism, un-comment the #define below.  The following combinations are valid:
+//
+// USE_TLS alone
+// USE_TLS & USE_CERTIFICATES
+// USE_TLS & USE_USERNAME_PASSWORD
+// USE_USERNAME_PASSWORD
+// <none>
+//
+// USE_CERTIFICATES cannot be used without also declaring USE_TLS
+
+//#define USE_TLS
+//#define USE_CERTIFICATES
+//#define USE_USERNAME_PASSWORD
 
 #define MQTT_BROKER_HOST "mqtt.example.com"
 // MQTT_BROKER_PORT generally is 1883 for clear-text, 8883 for TLS
@@ -41,6 +51,9 @@
 #endif
 
 #ifdef USE_CERTIFICATES
+#ifndef USE_TLS
+#error "USE_TLS required to be set as well for USE_CERTIFICATES"
+#endif
 #include "tls_credentials.h"
 #endif
 

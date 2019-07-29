@@ -127,7 +127,7 @@ The library will now be present for Arduino IDE to use. To update the library:
   1.`Sample` is the top-level file, it contains the sketch's [setup()] (https://www.arduino.cc/reference/en/language/structure/sketch/setup/) and [loop()](https://www.arduino.cc/reference/en/language/structure/sketch/loop/) functions. You can uncomment one of the `#include Sample*` directives, to enable a sample using a specific sensor. If you want to customize your sketch, you can do it directly here, or in the included modules.
   2. `SampleButton.h`, `SampleGPS.h`, `SampleTemperatureAndHumidity.h` and `SampleUltrasonic.h` include the actual code for setting up and running samples using a button, GPS receiver, temperature/humidity sensor and ultrasonic proximity sensor respectively.
   3. `config.h` is for you to set up your specific application.
-    * change `#undef USE_TLS`, `#undef USE_CERTIFICATES` and/or `#undef USE_USERNAME_PASSWORD` to respective `#define`s to enable TLS, certificates header (see below) and username/password authentication respectively
+    * un-comment out `#define USE_TLS`, `#define USE_CERTIFICATES` and/or `#define USE_USERNAME_PASSWORD` to enable TLS and either certificates header (see below) or username/password authentication respectively
     * Set `MQTT_BROKER_HOST` and `MQTT_BROKER_PORT` to the location of your MQTT broker
     * Change `MQTT_KEEP_ALIVE` to 1 if your broker tends to reset connections on inactivity
     * Set `MQTT_CLIENT_ID` to whatever you want your client ID to be
