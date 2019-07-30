@@ -74,8 +74,7 @@ void loop() {
 
 continue_loop:
   rn4_modem->AT.spin();
-  if ((paho_client != nullptr) && (paho_client->yield(LOOP_INTERVAL) != 0)) {
-    LOG(L_WARN, "Yield returned error - likely disconnected now: %d\r\n", paho_client->isConnected());
-    mqtt_disconnect();
+  if (mqtt != nullptr) {
+    mqtt->yield(LOOP_INTERVAL);
   }
 }

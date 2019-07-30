@@ -44,6 +44,11 @@
 // Arduino loop interval
 #define LOOP_INTERVAL 200
 
+// MQTT Settings
+//#define MQTT_LOG_ENABLED 1
+#define MAX_MQTT_PACKET_SIZE 500
+#define MAX_MQTT_SUBSCRIPTIONS 2
+
 #ifdef USE_TLS
 // TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
 #define TLS_PROFILE_ID 0
