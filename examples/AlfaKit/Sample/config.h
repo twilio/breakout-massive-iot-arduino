@@ -14,18 +14,13 @@
 #ifndef BREAKOUT_CONFIG_H_
 #define BREAKOUT_CONFIG_H_
 
-// To enable an autentication mechanism, un-comment the #define below.  The following combinations are valid:
+// To enable an autentication mechanism, un-comment the #define below.  The following are supported mechanisms:
 //
-// USE_TLS alone
-// USE_TLS & USE_CERTIFICATES
-// USE_TLS & USE_USERNAME_PASSWORD
-// USE_USERNAME_PASSWORD
-// <none>
-//
-// USE_CERTIFICATES cannot be used without also declaring USE_TLS
+// USE_USERNAME_PASSWORD - Enables cleartext username/password authentication.
+// USE_TLS_CERTIFICATES - Enables TLS and uses client certificates for authentication; TLS with username/password not supported at this time.
+// USE_TLS_USERNAME_PASSWORD - Coming soon
 
-//#define USE_TLS
-//#define USE_CERTIFICATES
+//#define USE_TLS_CERTIFICATES
 //#define USE_USERNAME_PASSWORD
 
 #define MQTT_BROKER_HOST "mqtt.example.com"
@@ -49,16 +44,13 @@
 #define MAX_MQTT_PACKET_SIZE 500
 #define MAX_MQTT_SUBSCRIPTIONS 2
 
-#ifdef USE_TLS
+#ifdef USE_TLS_CERTIFICATES
+#define USE_TLS
+
 // TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
 #define TLS_PROFILE_ID 0
 #define TLS_CIPHER_SUITE USECPREF_CIPHER_SUITE_TLS_RSA_WITH_AES_256_CBC_SHA256
-#endif
 
-#ifdef USE_CERTIFICATES
-#ifndef USE_TLS
-#error "USE_TLS required to be set as well for USE_CERTIFICATES"
-#endif
 #include "tls_credentials.h"
 #endif
 

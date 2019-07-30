@@ -66,7 +66,7 @@ void modem_setup() {
 
 #ifdef USE_TLS
 void configure_tls() {
-#ifdef USE_CERTIFICATES
+#ifdef USE_TLS_CERTIFICATES
   str ca = {.s = TLS_SERVER_CA, .len = sizeof(TLS_SERVER_CA)};
   rn4_modem->ssl.setServerCA(ca);
 
