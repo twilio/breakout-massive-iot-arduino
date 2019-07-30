@@ -29,7 +29,7 @@ void sample_gps_loop() {
                  data.position.is_north ? "N" : "S", data.position.longitude_degrees, data.position.longitude_minutes,
                  data.position.is_west ? "W" : "E");
         if (!send_data(commandText)) {
-          LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
+          LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", mqtt->isConnected());
         }
       }
     }

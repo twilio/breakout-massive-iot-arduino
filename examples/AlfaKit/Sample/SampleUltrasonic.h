@@ -32,7 +32,7 @@ void sample_ultrasonic_loop() {
       snprintf(commandText, 512, "{\"device\":\"%.*s\",\"object\":\"%s\"}", imei.len, imei.s,
                (detected ? "detected" : "lost"));
       if (!send_data(commandText)) {
-        LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", paho_client->isConnected());
+        LOG(L_WARN, "Error publishing message: (client connected status: %d)\r\n", mqtt->isConnected());
       }
     }
   }

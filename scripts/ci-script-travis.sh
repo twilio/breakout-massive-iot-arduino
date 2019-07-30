@@ -35,6 +35,7 @@ EOF
 ./arduino-cli --config-file arduino-cli.yaml lib update-index
 ./arduino-cli --config-file arduino-cli.yaml lib install 'Grove Temperature And Humidity Sensor'
 ./arduino-cli --config-file arduino-cli.yaml lib install 'Grove Ultrasonic Ranger'
+./arduino-cli --config-file arduino-cli.yaml lib install 'ArduinoMqtt'
 
 rm -f ~/.arduino15/package_index.json # arduino doesn't trust package_index.json from arduino-cli and crashes, so just delete it
 
