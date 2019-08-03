@@ -23,12 +23,12 @@ This page documents how to get started using the Breakout SDK and what it provid
 The following items are required to use Breakout SDK:
 
 - Alfa Development Kit
--  [Arduino IDE 1.8.7+](https://www.arduino.cc/en/Main/Software)
-- dfu-util
+- [Arduino IDE 1.8.9+](https://www.arduino.cc/en/Main/Software)
+- dfu-util 0.9 or later recommended
 
 ## Installing the Narrowband SIM and the LTE Antenna into the Developer Board
 1.  [Register the Narrowband SIM](https://www.twilio.com/console/wireless/sims/register) in the Programmable Wireless Console
-2. Insert the **smallest** form factor of the Narrowband SIM in the **bottom** of the **two** slots available on the Developer Board
+2. Insert the **smallest** form factor of the Narrowband SIM in the **bottom** of the **two** slots available on the Developer Board, closest to the PCB.
 
 ![Narrowband SIM holder](img/alfa-developer-board-sim-holder.png)
 
@@ -40,7 +40,7 @@ The following items are required to use Breakout SDK:
 The following steps will guide you from downloading the Arduino IDE to installing sample applications on your Developer board.
 
 ### Arduino IDE Installation
-1. Download [Arduino IDE 1.8.7+](https://www.arduino.cc/en/Main/Software)
+1. Download [Arduino IDE 1.8.9+](https://www.arduino.cc/en/Main/Software)
 
 ### dfu-util Installation
 ##### OSX
@@ -100,14 +100,14 @@ _DONE_
   ![Arduino Preferences](img/arduino-boardmanager-stm32f4.png)
 
 ### Breakout SDK Installation
-1. Click the green "Clone or download" button at the top right handside of this repository
-2. Click the [Download as ZIP file](https://github.com/twilio/Breakout_Arduino_Library/archive/master.zip) button
+The Arduino library makes use of a submodule for the shared cellular module code.  Please be sure to either install a bundled release zip below or perform a recursive clone locally.
+
+1. Visit the [releases page](https://github.com/twilio/Breakout_Massive_SDK_Arduino/releases) for this project
+2. Download the most recent recent as a ZIP file, by expanding the Assets section of the release
 3. Make note of the download location
 4. Open Arduino IDE
 5. Select Sketch > Include Library > Add .ZIP Library and select the .zip file downloaded
 6. Restart Arduino IDE
-
-  ![Download Repository](img/breakoutsdk-download-zip.png)
 
 ### Updating Breakout SDK on your local machine
 The library will now be present for Arduino IDE to use. To update the library:
@@ -117,20 +117,20 @@ The library will now be present for Arduino IDE to use. To update the library:
     * OSX: in ~/Documents/Arduino/libraries
 2. Follow the steps in the [Breakout SDK Installation](#Breakout-SDK-Installation) section above
 
->  **Tip:** An alternative to downloading the library as a ZIP is to check the library out using ```git``` in the Arduino/libraries directory, or symlink the locally-checked out copy there.
+>  **Tip:** An alternative to downloading the library as a ZIP is to check the library out using ```git``` in the Arduino/libraries directory, or symlink the locally-checked out copy there, just be sure to update the submodules.
 
 ## Flash the Developer Board with sample applications
 1. Open Arduino IDE
 2. Click File > examples and navigate to the Breakout Arduino Library examples
-3. Select File > Examples > Breakout Arduino Library > AlfaKit > Sample.ino
+3. Select File > Examples > Breakout Massive SDK Arduino Library > AlfaKit > Sample.ino
 4. Several tabs should be open now
   1.`Sample` is the top-level file, it contains the sketch's [setup()] (https://www.arduino.cc/reference/en/language/structure/sketch/setup/) and [loop()](https://www.arduino.cc/reference/en/language/structure/sketch/loop/) functions. You can uncomment one of the `#include Sample*` directives, to enable a sample using a specific sensor. If you want to customize your sketch, you can do it directly here, or in the included modules.
   2. `SampleButton.h`, `SampleGPS.h`, `SampleTemperatureAndHumidity.h` and `SampleUltrasonic.h` include the actual code for setting up and running samples using a button, GPS receiver, temperature/humidity sensor and ultrasonic proximity sensor respectively.
   3. `config.h` is for you to set up your specific application.
-    * un-comment out `#define USE_TLS`, `#define USE_CERTIFICATES` and/or `#define USE_USERNAME_PASSWORD` to enable TLS and either certificates header (see below) or username/password authentication respectively
+    * un-comment out `#define USE_TLS_CERTIFICATES` or `#define USE_USERNAME_PASSWORD` to enable either TLS + certificates header (see below) or username/password authentication respectively
     * Set `MQTT_BROKER_HOST` and `MQTT_BROKER_PORT` to the location of your MQTT broker
-    * Change `MQTT_KEEP_ALIVE` to 1 if your broker tends to reset connections on inactivity
-    * Set `MQTT_CLIENT_ID` to whatever you want your client ID to be
+    * Change `MQTT_KEEP_ALIVE` to 20 if your broker tends to reset connections on inactivity, you can adjust this keep alive interval to your needs
+    * Set `MQTT_CLIENT_ID` to whatever you want your client ID to be, please note this must be unique across clients connected to your MQTT broker
     * Change `MQTT_PUBLISH_TOPIC` and `MQTT_STATE_TOPIC` to the topics you want your sample to be publishing and listening to. If you want to go deeper, you can always define more topics to publish/subscribe to, no need to add them to the `config.h` if you don't want to.
     * If you are using login/password authentication, set the credentials in `MQTT_LOGIN` and `MQTT_PASSWORD`.
   4. `tls_credentials.h` is for you to paste your TLS credentials, including device's certificate and private key (`TLS_DEVICE_CERT`, `TLS_DEVICE_PKEY`) and server's certificate authority certificate (`TLS_SERVER_CA`)
@@ -160,7 +160,7 @@ Receiving the output ```WARNING: Category 'Device' in library Wio LTE Arduino Li
 
 ## Developer Board LEDs
 The LEDs on the Developer Board are set to function as the following:
-- Red CHG LED - Lights up based on the battery charging level. 
+- Red CHG LED - Lights up based on the battery charging level, will flicker dimly when no battery is connected.
 - Yellow Status LED - lights up when the modem module is power on.
 - Blue Network LED - lights up when the modem module is successfully registered to the mobile NB-IoT network.
 - Red RST LED - lights up during the reset procedure. To place the module in firmware flashing mode, press the BOOT0 switch on the board when this LED lights up.
@@ -175,7 +175,7 @@ The LEDs on the Developer Board are set to function as the following:
        * OSX: Type the following in a Terminal: ``brew install dfu-util``
  2. Unable to remove lithium battery from Developer Board.
     *  **Problem:** JST pings lock lithium battery into place.
-    *  **Solution:**  If the battery is pushed in a touch too far, it locks. Lift the pins from the JST connector and pull on the lithium battery cable. The JST connector has tabs that dig in and are not meant to be disconnected again.
+    *  **Solution:**  If the battery is pushed in a touch too far, it locks. Lift the pins from the JST connector and pull on the lithium battery cable or use a pair of needle nose pliers to get ahold of the connector. Be careful not to damage or puncture the battery as they can be dangerous if damaged. The JST connector has tabs that latch on and are not generally meant to be disconnected again.
  3. `No DFU capable USB device available`
       *  **Problem:** Unable to upload firmware. Device is not in DFU mode.
       ```
