@@ -119,6 +119,12 @@ The library will now be present for Arduino IDE to use. To update the library:
 
 >  **Tip:** An alternative to downloading the library as a ZIP is to check the library out using ```git``` in the Arduino/libraries directory, or symlink the locally-checked out copy there, just be sure to update the submodules.
 
+### Dependency Installation
+
+1. Open Arduino IDE
+2. Visit `Tools` -> `Manage Libraries`
+3. Search for `Paho` then install the `ArduinoMqtt` library, version `1.5.1` or better
+
 ## Flash the Developer Board with sample applications
 1. Open Arduino IDE
 2. Click File > examples and navigate to the Breakout Arduino Library examples
