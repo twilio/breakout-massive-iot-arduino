@@ -9,6 +9,9 @@ void owlPowerOn(uint32_t power_bitmask) {
 
     pinMode(MODULE_PWR_PIN, OUTPUT);
     digitalWrite(MODULE_PWR_PIN, HIGH);  // Module Power Default HIGH
+    
+    pinMode(GROVE_PWR_PIN, OUTPUT);
+    digitalWrite(GROVE_PWR_PIN, HIGH);  // VCC_B Enable pin
 
     /* Is this just for the modem? or also the rest? */
     pinMode(PWR_KEY_PIN, OUTPUT);
