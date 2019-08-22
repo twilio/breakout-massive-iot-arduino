@@ -16,7 +16,7 @@
 DHT dht(SENSOR_PIN, DHTTYPE);
 
 void sample_temperature_humidity_setup() {
-  pinMode(SENSOR_PIN, INPUT);
+  dht.begin();
 }
 
 void sample_temperature_humidity_loop() {
