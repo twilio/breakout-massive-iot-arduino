@@ -6,6 +6,7 @@
 OwlModemRN4 *rn4_modem                 = nullptr;
 ArduinoSeeedUSBOwlSerial *debug_serial = nullptr;
 ArduinoSeeedHwOwlSerial *modem_serial  = nullptr;
+ArduinoSeeedHwOwlSerial *gnss_serial   = nullptr;
 
 str imei = {.s = nullptr, .len = 0};
 
@@ -22,7 +23,7 @@ void modem_setup() {
   LOG(L_WARN, "Arduino setup() starting up\r\n");
   debug_serial = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
   modem_serial = new ArduinoSeeedHwOwlSerial(&SerialModule, SerialModule_Baudrate);
-  rn4_modem    = new OwlModemRN4(modem_serial, debug_serial);
+  rn4_modem    = new OwlModemRN4(modem_serial, debug_serial, gnss_serial);
 
   LOG(L_WARN, "Powering on module...");
   if (!rn4_modem->powerOn()) {
