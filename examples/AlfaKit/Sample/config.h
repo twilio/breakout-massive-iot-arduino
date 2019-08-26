@@ -17,11 +17,12 @@
 // To enable an autentication mechanism, un-comment the #define below.  The following are supported mechanisms:
 //
 // USE_USERNAME_PASSWORD - Enables cleartext username/password authentication.
-// USE_TLS_CERTIFICATES - Enables TLS and uses client certificates for authentication; TLS with username/password not supported at this time.
-// USE_TLS_USERNAME_PASSWORD - Coming soon
+// USE_TLS_USERNAME_PASSWORD - Enables TLS and uses username/password for authentication
+// USE_TLS_CLIENT_CERTIFICATES - Enables TLS and uses client certificates for authentication
 
-//#define USE_TLS_CERTIFICATES
 //#define USE_USERNAME_PASSWORD
+//#define USE_TLS_USERNAME_PASSWORD
+//#define USE_TLS_CLIENT_CERTIFICATES
 
 #define MQTT_BROKER_HOST "mqtt.example.com"
 // MQTT_BROKER_PORT generally is 1883 for clear-text, 8883 for TLS
@@ -31,7 +32,7 @@
 #define MQTT_PUBLISH_TOPIC "device/data"
 #define MQTT_STATE_TOPIC "device/state"
 
-#ifdef USE_USERNAME_PASSWORD
+#if defined(USE_USERNAME_PASSWORD) || defined(USE_TLS_USERNAME_PASSWORD)
 #define MQTT_LOGIN "login"
 #define MQTT_PASSWORD "password"
 #endif
@@ -44,7 +45,7 @@
 #define MAX_MQTT_PACKET_SIZE 500
 #define MAX_MQTT_SUBSCRIPTIONS 2
 
-#ifdef USE_TLS_CERTIFICATES
+#if defined(USE_TLS_CLIENT_CERTIFICATES) || defined(USE_TLS_USERNAME_PASSWORD)
 #define USE_TLS
 
 // TLS_PROFILE_ID 0 is usually a good default unless using multiple profiles - possible values 0-4
