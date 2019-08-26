@@ -26,6 +26,13 @@
 // the trusted CA root, device cert and private key and paste below - observing the required header/footer
 // and ""\ format.
 
+//#define TLS_SERVER_CA "" \
+//"-----BEGIN CERTIFICATE-----" \
+//"..." \
+//"-----END CERTIFICATE-----"
+//#endif
+
+#ifdef USE_TLS_CLIENT_CERTIFICATES
 //#define TLS_DEVICE_CERT "" \
 //"-----BEGIN CERTIFICATE-----" \
 //"..." \
@@ -35,12 +42,7 @@
 //"-----BEGIN RSA PRIVATE KEY-----" \
 //"..." \
 //"-----END RSA PRIVATE KEY-----"
-
-//#define TLS_SERVER_CA "" \
-//"-----BEGIN CERTIFICATE-----" \
-//"..." \
-//"-----END CERTIFICATE-----"
-//#endif
+#endif
 
 
 // To provide DER encoded items, a help script is provided.  To generate this file from *.pem or *.der
@@ -53,8 +55,10 @@
 
 //#define TLS_SERVER_CA "\x00\x01\x02..."
 
+#ifdef USE_TLS_CLIENT_CERTIFICATES
 //#define TLS_DEVICE_CERT "\x00\x01\x02..."
 
 //#define TLS_DEVICE_PKEY "\x00\x01\x02.."
+#endif
 
 #endif  // TLS_CREDENTIALS_H_
