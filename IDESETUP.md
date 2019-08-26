@@ -57,7 +57,9 @@ The following step is required for OSX:
 ##### Windows
 
 The follow steps are required for Windows:
-1.  [Install USB Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#install-usb-driver)
+
+1. [Install USB Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#install-usb-driver)
+2. You may also need to [Update DFU Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#change-dfu-driver) for flashing to succeed
 
 ##### Ubuntu
 
