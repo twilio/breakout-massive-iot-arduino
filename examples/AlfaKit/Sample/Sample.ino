@@ -15,8 +15,9 @@
 // at a time by default.  You can edit the header file to specify D20 to use two of the
 // components simultaneously.
 //#include "SampleButton.h"
-#include "SampleTemperatureAndHumidity.h"
+//#include "SampleTemperatureAndHumidity.h"
 //#include "SampleUltrasonic.h"
+#include "SampleSGP30.h"
 
 // This sample is independent of the grove input ports so can be used with any of the above
 // samples.  Please keep in mind GPS reception is best either outside or very close to an
@@ -53,6 +54,9 @@ void setup() {
 #ifdef SAMPLE_ULTRASONIC
   sample_ultrasonic_setup();
 #endif
+#ifdef SAMPLE_SGP30
+  sample_sgp30_setup();
+#endif
 
   return;
 }
@@ -75,6 +79,9 @@ void loop() {
 #endif
 #ifdef SAMPLE_ULTRASONIC
   sample_ultrasonic_loop();
+#endif
+#ifdef SAMPLE_SGP30
+  sample_sgp30_loop();
 #endif
 
 continue_loop:
