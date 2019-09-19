@@ -12,7 +12,7 @@
  *
  */
 
-#define TESTING_APN "nb.iot"
+#define TESTING_APN "iot.nb"
 
 #define TESTING_VARIANT_INIT 0
 #define TESTING_VARIANT_REG 0

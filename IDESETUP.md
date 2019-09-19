@@ -57,7 +57,9 @@ The following step is required for OSX:
 ##### Windows
 
 The follow steps are required for Windows:
-1.  [Install USB Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#install-usb-driver)
+
+1. [Install USB Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#install-usb-driver)
+2. You may also need to [Update DFU Drivers](http://wiki.seeedstudio.com/Wio_LTE_Cat_M1_NB-IoT_Tracker/#change-dfu-driver) for flashing to succeed
 
 ##### Ubuntu
 
@@ -126,20 +128,23 @@ The library will now be present for Arduino IDE to use. To update the library:
 3. Search for `Paho` then install the `ArduinoMqtt` library, version `1.5.1` or better
 
 ## Flash the Developer Board with sample applications
+
+The samples depend on an MQTT broker.  If you have one configured already, or are using a service like Microsoft Azure IoT or AWS IoT, you can use the connection information specified by your provider.  If you need a test broker to use for the samples, see our [Sample MQTT Broker](https://www.twilio.com/docs/wireless/tutorials/programmable-wireless-sample-mqtt-broker-server) documentation for instructions on how to set one up quickly using Docker.
+
 1. Open Arduino IDE
-2. Click File > examples and navigate to the Breakout Arduino Library examples
+2. Click File > Examples and navigate to the Breakout Arduino Library examples
 3. Select File > Examples > Breakout Massive SDK Arduino Library > AlfaKit > Sample.ino
 4. Several tabs should be open now
-  1.`Sample` is the top-level file, it contains the sketch's [setup()] (https://www.arduino.cc/reference/en/language/structure/sketch/setup/) and [loop()](https://www.arduino.cc/reference/en/language/structure/sketch/loop/) functions. You can uncomment one of the `#include Sample*` directives, to enable a sample using a specific sensor. If you want to customize your sketch, you can do it directly here, or in the included modules.
+  1.`Sample` is the top-level file, it contains the sketch's [setup()](https://www.arduino.cc/reference/en/language/structure/sketch/setup/) and [loop()](https://www.arduino.cc/reference/en/language/structure/sketch/loop/) functions. You can uncomment one of the `#include Sample*` directives, to enable a sample using a specific sensor. If you want to customize your sketch, you can do it directly here, or in the included modules.
   2. `SampleButton.h`, `SampleGPS.h`, `SampleTemperatureAndHumidity.h` and `SampleUltrasonic.h` include the actual code for setting up and running samples using a button, GPS receiver, temperature/humidity sensor and ultrasonic proximity sensor respectively.
   3. `config.h` is for you to set up your specific application.
-    * un-comment out `#define USE_TLS_CERTIFICATES` or `#define USE_USERNAME_PASSWORD` to enable either TLS + certificates header (see below) or username/password authentication respectively
+    * un-comment out `#define USE_TLS_CLIENT_CERTIFICATES`, `#define USE_TLS_USERNAME_PASSWORD` or `#define USE_USERNAME_PASSWORD` to enable either TLS + certificates header (see below), the TLS + username/password, or username/password authentication respectively
     * Set `MQTT_BROKER_HOST` and `MQTT_BROKER_PORT` to the location of your MQTT broker
     * Change `MQTT_KEEP_ALIVE` to 20 if your broker tends to reset connections on inactivity, you can adjust this keep alive interval to your needs
     * Set `MQTT_CLIENT_ID` to whatever you want your client ID to be, please note this must be unique across clients connected to your MQTT broker
     * Change `MQTT_PUBLISH_TOPIC` and `MQTT_STATE_TOPIC` to the topics you want your sample to be publishing and listening to. If you want to go deeper, you can always define more topics to publish/subscribe to, no need to add them to the `config.h` if you don't want to.
     * If you are using login/password authentication, set the credentials in `MQTT_LOGIN` and `MQTT_PASSWORD`.
-  4. `tls_credentials.h` is for you to paste your TLS credentials, including device's certificate and private key (`TLS_DEVICE_CERT`, `TLS_DEVICE_PKEY`) and server's certificate authority certificate (`TLS_SERVER_CA`)
+  4. `tls_credentials.h` is for you to paste your TLS credentials, including device's certificate and private key (`TLS_DEVICE_CERT`, `TLS_DEVICE_PKEY`) and server's certificate authority certificate (`TLS_SERVER_CA`).  If you are using TLS + username/password authentication, you may just provide the `TLS_SERVER_CA` certificate.
   5. `modem.h` contains service procedures to initialize the modem on the AlfaKit. Refer to it if you're curious about what is happening under the hood.
   6. `mqtt.h` contains shims to integrate with Paho MQTT client, and publishing/subscribing code. It is what you will want to hack on if you want to create more topics.
 > **Note:** The example ino files are readonly. Save your changes to a new location.
