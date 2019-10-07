@@ -112,7 +112,31 @@ class RawGNSSBypass : public OwlModemCLIExecutor {
   }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    cli.owlModem->bypassGNSSCLI();
+    int exitbypass_idx = 0;
+    static const char exitbypass_str[] = "exitbypass";
+    uint8_t c;
+
+    for(;;) {
+      if (cli.gnssPort->available()) {
+	cli.gnssPort->read(&c, 1);
+        cli.debugPort->write(&c, 1);
+      }
+
+      if(cli.debugPort->available()) {
+        cli.debugPort->read(&c, 1);
+	cli.gnssPort->write(&c, 1);
+
+	if(exitbypass_str[exitbypass_idx] == c) {
+          exitbypass_idx++;
+
+	  if (exitbypass_idx == sizeof(exitbypass_str)) {
+            return;
+	  }
+	} else {
+          exitbypass_idx = 0;
+	}
+      }
+    }
   }
 };
 
@@ -307,7 +331,8 @@ class GetPINStatus : public OwlModemCLIExecutor {
   GetPINStatus() : OwlModemCLIExecutor("SIM.getPINStatus", "Check PIN status (aka AT+CPIN?)") {
   }
 
-  static void handlerPIN(str cpin) {
+  static void handlerPIN(str cpin, void* priv) {
+    (void) priv;
     if (!savedCLI) return;
     LOGF(L_CLI, "Received CPIN [%.*s]\r\n", cpin.len, cpin.s);
   }
@@ -1173,9 +1198,9 @@ class GetGNSSData : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     gnss_data_t data;
-    if (cli.owlModem->gnss.getGNSSData(&data)) {
+    if (cli.owlGnss->getGNSSData(&data)) {
       LOGF(L_CLI, "OK\r\n");
-      cli.owlModem->gnss.logGNSSData(L_CLI, data);
+      cli.owlGnss->logGNSSData(L_CLI, data);
     } else {
       LOGF(L_CLI, "ERROR\r\n");
     }
@@ -1202,9 +1227,130 @@ class SSLInitializeContext: public OwlModemCLIExecutor {
   }
 };
 
+/*
+ * Handlers
+ */
+void handler_NetworkRegistrationStatusChange(at_creg_stat_e stat, uint16_t lac, uint32_t ci, at_creg_act_e act) {
+  LOG(L_INFO,
+      "\r\n>>>\r\n>>>URC-Network>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x "
+      "Act=%d(%s)\r\n>>>\r\n\r\n",
+      stat, at_creg_stat_text(stat), lac, ci, act, at_creg_act_text(act));
+}
 
-OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
-  this->owlModem  = modem;
+void handler_GPRSRegistrationStatusChange(at_cgreg_stat_e stat, uint16_t lac, uint32_t ci, at_cgreg_act_e act,
+                                          uint8_t rac) {
+  LOG(L_INFO,
+      "\r\n>>>\r\n>>>URC-GPRS>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x Act=%d(%s) "
+      "RAC=0x%02x\r\n>>>\r\n\r\n",
+      stat, at_cgreg_stat_text(stat), lac, ci, act, at_cgreg_act_text(act), rac);
+}
+
+void handler_EPSRegistrationStatusChange(at_cereg_stat_e stat, uint16_t lac, uint32_t ci, at_cereg_act_e act,
+                                         at_cereg_cause_type_e cause_type, uint32_t reject_cause) {
+  LOG(L_INFO,
+      "\r\n>>>\r\n>>>URC-EPS>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x Act=%d(%s) "
+      "Cause-Type=%d(%s) Reject-Cause=%u\r\n>>>\r\n\r\n",
+      stat, at_cereg_stat_text(stat), lac, ci, act, at_cereg_act_text(act), cause_type,
+      at_cereg_cause_type_text(cause_type), reject_cause);
+}
+
+void handler_UDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data) {
+  LOG(L_INFO,
+      "\r\n>>>\r\n>>>URC-UDP-Data>>> Received UDP data from socket=%d remote_ip=%.*s remote_port=%u of %d bytes\r\n",
+      socket, remote_ip.len, remote_ip.s, remote_port, data.len);
+  LOGSTR(L_INFO, data);
+  LOGE(L_INFO, "]\r\n>>>\r\n\r\n");
+}
+
+static void handler_SocketClosed(uint8_t socket) {
+  LOG(L_INFO, "\r\n>>>\r\n>>>URC-Socket-Closed>>> Socket Closed socket=%d", socket);
+}
+
+
+static int pin_count = 0;
+
+void handler_PIN(str message, void* priv) {
+  OwlModemCLI* cli = (OwlModemCLI*) priv;
+  LOG(L_CLI, "\r\n>>>\r\n>>>PIN>>> %.*s\r\n>>>\r\n\r\n", message.len, message.s);
+  if (str_equalcase_char(message, "READY")) {
+    /* Seems fine */
+  } else if (str_equalcase_char(message, "SIM PIN")) {
+    /* The card needs the PIN */
+    pin_count++;
+    if (pin_count > 1) {
+      LOG(L_CLI, "Trying to avoid a PIN lock - too many attempts to enter the PIN\r\n");
+    } else {
+      LOG(L_CLI, "Verifying PIN...\r\n");
+      if (cli->owlModem->SIM.verifyPIN(cli->simPin)) {
+        LOG(L_CLI, "... PIN verification OK\r\n");
+      } else {
+        LOG(L_CLI, "... PIN verification Failed\r\n");
+      }
+    }
+  } else if (str_equalcase_char(message, "SIM PUK")) {
+    /* and so on ... */
+  } else if (str_equalcase_char(message, "SIM PIN2")) {
+    /* and so on ... */
+  } else if (str_equalcase_char(message, "SIM PUK2")) {
+    /* and so on ... */
+  } else if (str_equalcase_char(message, "SIM not inserted")) {
+    /* Panic mode :) */
+    LOG(L_CLI, "No SIM in, not much to do...\r\n");
+  }
+}
+
+
+
+void OwlModemCLI::setup(int init_options, int reg_options, const char* apn, str sim_pin) {
+  simPin = sim_pin;
+
+  LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - powering on modules\r\n");
+  if (!owlModem->powerOn()) {
+    LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to power on\r\n");
+    return;
+  }
+  LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - now powered on.\r\n");
+
+  /* Initialize modem configuration to something we can trust. */
+  LOG(L_NOTICE, ".. OwlModem - initializing modem\r\n");
+
+  char *cops = nullptr;
+#ifdef MOBILE_OPERATOR
+  cops = MOBILE_OPERATOR;
+#endif
+
+  at_cops_format_e cops_format = AT_COPS__Format__Numeric;
+
+#ifdef MOBILE_OPERATOR_FORMAT
+  cops_format = MOBILE_OPERATOR_FORMAT;
+#endif
+
+  if (!owlModem->initModem(init_options, apn, cops, cops_format)) {
+    LOG(L_NOTICE, "..   - failed initializing modem! - resetting in 30 seconds\r\n");
+    owl_delay(30000);
+    return;
+  }
+  LOG(L_NOTICE, ".. OwlModem - initialization successfully completed\r\n");
+
+
+  LOG(L_NOTICE, ".. Setting handlers for SIM-PIN and NetworkRegistration Unsolicited Response Codes\r\n");
+  owlModem->SIM.setHandlerPIN(handler_PIN, this);
+  owlModem->network.setHandlerNetworkRegistrationURC(handler_NetworkRegistrationStatusChange);
+  owlModem->network.setHandlerGPRSRegistrationURC(handler_GPRSRegistrationStatusChange);
+  owlModem->network.setHandlerEPSRegistrationURC(handler_EPSRegistrationStatusChange);
+
+  if (!owlModem->waitForNetworkRegistration("devkit", reg_options)) {
+    LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to register to the network\r\n");
+    return;
+  }
+  LOG(L_NOTICE, ".. OwlModem - registered to network\r\n");
+}
+
+OwlModemCLI::OwlModemCLI(IOwlSerial *modem_port, IOwlSerial *gnss_port, IOwlSerial *debug_port) {
+  this->owlModem  = new OwlModemRN4(modem_port, debug_port);
+  this->owlGnss   = new OwlGNSS(gnss_port);
+  this->modemPort = modem_port;
+  this->gnssPort  = gnss_port;
   this->debugPort = debug_port;
 
   executors = (OwlModemCLIExecutor **)owl_malloc(MAX_COMMANDS * sizeof(OwlModemCLIExecutor *));

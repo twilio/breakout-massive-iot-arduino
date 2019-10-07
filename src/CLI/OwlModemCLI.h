@@ -26,6 +26,7 @@
 
 #include "massive-sdk/src/modem/enums.h"
 #include "massive-sdk/src/modem/OwlModemRN4.h"
+#include "massive-sdk/src/modem/OwlGNSS.h"
 
 #define MODEM_CLI_CMD_HISTORY 16
 #define MODEM_CLI_CMD_LEN 256
@@ -98,7 +99,7 @@ class OwlModemCLIExecutor {
  */
 class OwlModemCLI {
  public:
-  OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debugPort);
+  OwlModemCLI(IOwlSerial *modem_port, IOwlSerial *gnss_port, IOwlSerial *debug_port);
 
   ~OwlModemCLI();
 
@@ -112,9 +113,15 @@ class OwlModemCLI {
 
   int handleUserInput(int resume);
 
+  void setup(int init_options, int reg_options, const char* apn, str sim_pin);
+
 
   OwlModemRN4 *owlModem;
+  OwlGNSS *owlGnss;
+  IOwlSerial *modemPort;
+  IOwlSerial *gnssPort;
   IOwlSerial *debugPort;
+  str simPin;
 
   char cmdHistory[MODEM_CLI_CMD_HISTORY][MODEM_CLI_CMD_LEN + 1]; /**< Command history */
   int cmdHistoryLen[MODEM_CLI_CMD_HISTORY];                      /**< Length of the entries. Because, reasons. */

@@ -31,11 +31,6 @@
 void setup() {
   owl_log_set_level(L_INFO);
 
-#ifdef SAMPLE_GPS
-  // must occur before modem_setup() so GNSS serial port is associated
-  gnss_serial = new ArduinoSeeedHwOwlSerial(&SerialGNSS, SerialGNSS_Baudrate);
-#endif
-
   modem_setup();
   mqtt_setup();
 
