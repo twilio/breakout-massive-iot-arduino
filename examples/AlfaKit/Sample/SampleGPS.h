@@ -4,7 +4,13 @@
 
 #define GPS_SEND_INTERVAL (10 * 60 * 1000)
 
+OwlGNSS *gnss                          = nullptr;
+ArduinoSeeedHwOwlSerial *gnss_serial   = nullptr;
+
 void sample_gps_setup() {
+  gnss_serial = new ArduinoSeeedHwOwlSerial(&SerialGNSS, SerialGNSS_Baudrate);
+  gnss = new OwlGNSS(gnss_serial);
+
   owlPowerOn(OWL_POWER_GNSS);
 }
 
@@ -14,7 +20,7 @@ void sample_gps_loop() {
   if (!sleep) {
     gnss_data_t data;
 
-    if (rn4_modem->gnss.getGNSSData(&data) && data.valid &&
+    if (gnss->getGNSSData(&data) && data.valid &&
         ((last_send == 0) || (millis() - last_send >= GPS_SEND_INTERVAL))) {
       if (data.valid) {
         last_send = millis();

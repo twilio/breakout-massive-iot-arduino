@@ -25,6 +25,7 @@
 #include "massive-sdk/src/modem/enums.h"
 
 #include "massive-sdk/src/modem/OwlModemRN4.h"
+#include "massive-sdk/src/modem/OwlGNSS.h"
 #include "massive-sdk/src/modem/OwlModemBG96.h"
 
 #endif

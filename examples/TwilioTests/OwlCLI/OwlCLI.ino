@@ -39,8 +39,7 @@ static str sim_pin = STRDECL("000000");
 
 ArduinoSeeedUSBOwlSerial *debug_serial = 0;
 ArduinoSeeedHwOwlSerial *module_serial = 0;
-/* The Twilio-specific modem interface */
-OwlModemRN4 *owlModem = 0;
+ArduinoSeeedHwOwlSerial *gnss_serial = 0;
 /* This is only for API demonstration purposes, can be removed for in-production */
 OwlModemCLI *owlModemCLI = 0;
 
@@ -52,51 +51,10 @@ void setup() {
 
   debug_serial  = new ArduinoSeeedUSBOwlSerial(&SerialDebugPort);
   module_serial = new ArduinoSeeedHwOwlSerial(&SerialModule, SerialModule_Baudrate);
-  owlModem      = new OwlModemRN4(module_serial, debug_serial);
+  gnss_serial = new ArduinoSeeedHwOwlSerial(&SerialGnss, SerialGnss_Baudrate);
   owlModemCLI   = new OwlModemCLI(owlModem, debug_serial);
 
-  LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - powering on modules\r\n");
-  if (!owlModem->powerOn()) {
-    LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to power on\r\n");
-    return;
-  }
-  LOG(L_NOTICE, ".. WioLTE Cat.NB-IoT - now powered on.\r\n");
-
-  /* Initialize modem configuration to something we can trust. */
-  LOG(L_NOTICE, ".. OwlModem - initializing modem\r\n");
-
-  char *cops = nullptr;
-#ifdef MOBILE_OPERATOR
-  cops = MOBILE_OPERATOR;
-#endif
-
-  at_cops_format_e cops_format = AT_COPS__Format__Numeric;
-
-#ifdef MOBILE_OPERATOR_FORMAT
-  cops_format = MOBILE_OPERATOR_FORMAT;
-#endif
-
-  if (!owlModem->initModem(TESTING_VARIANT_INIT, TESTING_APN, cops, cops_format)) {
-    LOG(L_NOTICE, "..   - failed initializing modem! - resetting in 30 seconds\r\n");
-    delay(30000);
-    return;
-  }
-  LOG(L_NOTICE, ".. OwlModem - initialization successfully completed\r\n");
-
-
-  LOG(L_NOTICE, ".. Setting handlers for SIM-PIN and NetworkRegistration Unsolicited Response Codes\r\n");
-  owlModem->SIM.setHandlerPIN(handler_PIN);
-  owlModem->network.setHandlerNetworkRegistrationURC(handler_NetworkRegistrationStatusChange);
-  owlModem->network.setHandlerGPRSRegistrationURC(handler_GPRSRegistrationStatusChange);
-  owlModem->network.setHandlerEPSRegistrationURC(handler_EPSRegistrationStatusChange);
-
-  if (!owlModem->waitForNetworkRegistration("devkit", TESTING_VARIANT_REG)) {
-    LOG(L_ERR, ".. WioLTE Cat.NB-IoT - ... modem failed to register to the network\r\n");
-    return;
-  }
-  LOG(L_NOTICE, ".. OwlModem - registered to network\r\n");
-
-
+  owlModemCLI->setup(TESTING_VARIANT_INIT, TESTING_VARIANT_REG, TESTING_APN, sim_pin);
 
   LOG(L_NOTICE, "Arduino setup() done\r\n");
   LOG(L_NOTICE, "Arduino loop() starting\r\n");
@@ -116,78 +74,6 @@ void loop() {
   owlModem->socket.handleWaitingData();
 
   delay(50);
-}
-
-
-/*
- * Handlers
- */
-void handler_NetworkRegistrationStatusChange(at_creg_stat_e stat, uint16_t lac, uint32_t ci, at_creg_act_e act) {
-  LOG(L_INFO,
-      "\r\n>>>\r\n>>>URC-Network>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x "
-      "Act=%d(%s)\r\n>>>\r\n\r\n",
-      stat, at_creg_stat_text(stat), lac, ci, act, at_creg_act_text(act));
-}
-
-void handler_GPRSRegistrationStatusChange(at_cgreg_stat_e stat, uint16_t lac, uint32_t ci, at_cgreg_act_e act,
-                                          uint8_t rac) {
-  LOG(L_INFO,
-      "\r\n>>>\r\n>>>URC-GPRS>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x Act=%d(%s) "
-      "RAC=0x%02x\r\n>>>\r\n\r\n",
-      stat, at_cgreg_stat_text(stat), lac, ci, act, at_cgreg_act_text(act), rac);
-}
-
-void handler_EPSRegistrationStatusChange(at_cereg_stat_e stat, uint16_t lac, uint32_t ci, at_cereg_act_e act,
-                                         at_cereg_cause_type_e cause_type, uint32_t reject_cause) {
-  LOG(L_INFO,
-      "\r\n>>>\r\n>>>URC-EPS>>> Change in registration: Status=%d(%s) LAC=0x%04x CI=0x%08x Act=%d(%s) "
-      "Cause-Type=%d(%s) Reject-Cause=%u\r\n>>>\r\n\r\n",
-      stat, at_cereg_stat_text(stat), lac, ci, act, at_cereg_act_text(act), cause_type,
-      at_cereg_cause_type_text(cause_type), reject_cause);
-}
-
-void handler_UDPData(uint8_t socket, str remote_ip, uint16_t remote_port, str data) {
-  LOG(L_INFO,
-      "\r\n>>>\r\n>>>URC-UDP-Data>>> Received UDP data from socket=%d remote_ip=%.*s remote_port=%u of %d bytes\r\n",
-      socket, remote_ip.len, remote_ip.s, remote_port, data.len);
-  LOGSTR(L_INFO, data);
-  LOGE(L_INFO, "]\r\n>>>\r\n\r\n");
-}
-
-static void handler_SocketClosed(uint8_t socket) {
-  LOG(L_INFO, "\r\n>>>\r\n>>>URC-Socket-Closed>>> Socket Closed socket=%d", socket);
-}
-
-
-static int pin_count = 0;
-
-void handler_PIN(str message) {
-  LOG(L_CLI, "\r\n>>>\r\n>>>PIN>>> %.*s\r\n>>>\r\n\r\n", message.len, message.s);
-  if (str_equalcase_char(message, "READY")) {
-    /* Seems fine */
-  } else if (str_equalcase_char(message, "SIM PIN")) {
-    /* The card needs the PIN */
-    pin_count++;
-    if (pin_count > 1) {
-      LOG(L_CLI, "Trying to avoid a PIN lock - too many attempts to enter the PIN\r\n");
-    } else {
-      LOG(L_CLI, "Verifying PIN...\r\n");
-      if (owlModem->SIM.verifyPIN(sim_pin)) {
-        LOG(L_CLI, "... PIN verification OK\r\n");
-      } else {
-        LOG(L_CLI, "... PIN verification Failed\r\n");
-      }
-    }
-  } else if (str_equalcase_char(message, "SIM PUK")) {
-    /* and so on ... */
-  } else if (str_equalcase_char(message, "SIM PIN2")) {
-    /* and so on ... */
-  } else if (str_equalcase_char(message, "SIM PUK2")) {
-    /* and so on ... */
-  } else if (str_equalcase_char(message, "SIM not inserted")) {
-    /* Panic mode :) */
-    LOG(L_CLI, "No SIM in, not much to do...\r\n");
-  }
 }
 
 
