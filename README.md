@@ -1,10 +1,10 @@
-# Twilio Breakout Massive SDK for Arduino
+# Twilio Breakout SDK for Massive IoT - with Arduino support
 
 Breakout SDK enables developers to connect their devices over Narrowband cellular line.
 
 This SDK is primarily intended to connect our [Massive IoT Developer Kits](https://www.twilio.com/docs/wireless/quickstart/broadband-iot-developer-kit) equipped with [Twilio Narrowband SIMs](https://www.twilio.com/wireless/narrowband) to an [MQTT](https://mqtt.org) broker but can also be used on similar boards with Arduino support and with different protocols with modification.
 
-This Arduino compatible library is backed by a more generic cellular module abstraction layer, [Twilio Breakout Massive SDK](https://github.com/twilio/Breakout_Massive_SDK), which also has support for the Quectel BG96 NB-IoT module.  The goal of this module is to make packet based communications easier when dealing with these cellular modules.
+This Arduino compatible library is backed by a more generic cellular module abstraction layer, [Twilio Breakout SDK for Massive IoT](https://github.com/twilio/Breakout_Massive_SDK), which also has support for the Quectel BG96 NB-IoT module.  The goal of this module is to make packet based communications easier when dealing with these cellular modules.
 
 It is important to note that you must have a Narrowband SIM to utilize this kit, a standard LTE SIM will not be able to connect to the network.
 
