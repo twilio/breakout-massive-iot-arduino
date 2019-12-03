@@ -1,7 +1,7 @@
 #include "massive-sdk/src/platform/power.h"
 #include "board.h"
 
-void owlPowerOn(uint32_t power_bitmask) {
+void owl_power_on(uint32_t power_bitmask) {
   if (power_bitmask & OWL_POWER_RN4) {
     // Set RTS pin down to enable UART communication
     pinMode(RTS_PIN, OUTPUT);
@@ -39,7 +39,7 @@ void owlPowerOn(uint32_t power_bitmask) {
   }
 }
 
-void owlPowerOff(uint32_t power_bitmask) {
+void owl_power_off(uint32_t power_bitmask) {
   if (power_bitmask & OWL_POWER_RN4) {
     pinMode(MODULE_PWR_PIN, OUTPUT);
     digitalWrite(MODULE_PWR_PIN, HIGH);  // Module Power Default HIGH

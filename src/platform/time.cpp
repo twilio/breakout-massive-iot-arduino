@@ -30,12 +30,12 @@
 
 static uint32_t epoch = 0, last_millis = 0;
 
-extern "C" owl_time_t owl_time() {
+owl_time_t owl_time() {
   uint32_t now = millis();
   if (now < last_millis) epoch++;
   return (uint64_t)epoch << 32 | now;
 }
 
-extern "C" void owl_delay(uint32_t ms) {
+void owl_delay(uint32_t ms) {
   delay(ms);
 }

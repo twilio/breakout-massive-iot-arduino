@@ -8,7 +8,8 @@ ArduinoSeeedUSBOwlSerial *debug_serial = nullptr;
 ArduinoSeeedHwOwlSerial *modem_serial  = nullptr;
 ArduinoSeeedHwOwlSerial *gnss_serial   = nullptr;
 
-str imei = {.s = nullptr, .len = 0};
+char imei_buf[15];
+str imei = {.s = imei_buf, .len = 0};
 
 // forward declarations
 void configure_tls();
@@ -51,7 +52,13 @@ void modem_setup() {
 
   str imei_temp = {.s = nullptr, .len = 0};
   rn4_modem->information.getIMEI(&imei_temp);
-  str_dup(imei, imei_temp);
+  if (imei_temp.len > 15) {
+    LOG(L_WARN, "Got IMEI longer than 15 characters %.*s, truncating to %.*s\r\n", imei_temp.len, imei_temp.s, 15, imei_temp.s);
+    imei_temp.len = 15;
+  }
+
+  imei.len = imei_temp.len;
+  memcpy(imei.s, imei_temp.s, imei.len);
 
   LOG(L_WARN, "Waiting for network registration...");
   if (!rn4_modem->waitForNetworkRegistration("Telemetry", TESTING_VARIANT_REG)) {
