@@ -142,22 +142,6 @@ class PowerOff : public OwlModemCLIExecutor {
   }
 };
 
-
-class GetProductIdentification : public OwlModemCLIExecutor {
- public:
-  GetProductIdentification()
-      : OwlModemCLIExecutor("information.getProductIdentification", "Retrieve modem product identification (aka ATI)") {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->information.getProductIdentification(&response)) {
-      LOGF(L_CLI, "OK product_identification=[%.*s]\r\n", response.len, response.s);
-    } else {
-      LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
-    }
-  }
-};
-
 class GetManufacturer : public OwlModemCLIExecutor {
  public:
   GetManufacturer() : OwlModemCLIExecutor("information.getManufacturer", "Retrieve modem manufacturer (aka AT+CGMI)") {
@@ -214,52 +198,6 @@ class GetIMEI : public OwlModemCLIExecutor {
   }
 };
 
-class GetBatteryChargeLevels : public OwlModemCLIExecutor {
- public:
-  GetBatteryChargeLevels()
-      : OwlModemCLIExecutor("information.getBatteryChargeLevels", "Retrieve Battery Charge Levels (aka AT+CBC)") {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->information.getBatteryChargeLevels(&response)) {
-      LOGF(L_CLI, "OK BatteryChargeLevels=[%.*s]\r\n", response.len, response.s);
-    } else {
-      LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
-    }
-  }
-};
-
-class GetIndicators : public OwlModemCLIExecutor {
- public:
-  GetIndicators() : OwlModemCLIExecutor("information.getIndicators", "Retrieve indicators (aka AT+CIND)") {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->information.getIndicators(&response)) {
-      LOGF(L_CLI, "OK Indicators=[%.*s]\r\n", response.len, response.s);
-    } else {
-      LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
-    }
-  }
-};
-
-class GetIndicatorsHelp : public OwlModemCLIExecutor {
- public:
-  GetIndicatorsHelp()
-      : OwlModemCLIExecutor("information.getIndicatorsHelp", "Retrieve indicators help (aka AT+CIND=?)") {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->information.getIndicatorsHelp(&response)) {
-      LOGF(L_CLI, "OK BatteryChargeLevels=[%.*s]\r\n", response.len, response.s);
-    } else {
-      LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
-    }
-  }
-};
-
-
-
 class GetICCID : public OwlModemCLIExecutor {
  public:
   GetICCID() : OwlModemCLIExecutor("SIM.getICCID", "Retrieve ICCID (aka AT+CCID?)") {
@@ -288,20 +226,6 @@ class GetIMSI : public OwlModemCLIExecutor {
   }
 };
 
-class GetMSISDN : public OwlModemCLIExecutor {
- public:
-  GetMSISDN() : OwlModemCLIExecutor("SIM.getMSISDN", "Retrieve MSISDN (aka AT+CNUM)") {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->SIM.getMSISDN(&response)) {
-      LOGF(L_CLI, "OK MSISDN=[%.*s]\r\n", response.len, response.s);
-    } else {
-      LOGF(L_CLI, "ERROR status=[%.*s]\r\n", response.len, response.s);
-    }
-  }
-};
-
 class GetPINStatus : public OwlModemCLIExecutor {
  public:
   GetPINStatus() : OwlModemCLIExecutor("SIM.getPINStatus", "Check PIN status (aka AT+CPIN?)") {
@@ -322,38 +246,6 @@ class GetPINStatus : public OwlModemCLIExecutor {
     }
   }
 };
-
-class VerifyPIN : public OwlModemCLIExecutor {
- public:
-  VerifyPIN() : OwlModemCLIExecutor("SIM.verifyPIN", "<pin>", "Verify PIN (aka AT+CPIN=<pin>)", 1, 1) {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->SIM.verifyPIN(cmd.argv[0])) {
-      LOGF(L_CLI, "OK\r\n");
-    } else {
-      LOGF(L_CLI, "ERROR\r\n");
-    }
-  }
-};
-
-class VerifyPUK : public OwlModemCLIExecutor {
- public:
-  VerifyPUK()
-      : OwlModemCLIExecutor("SIM.verifyPUK", "<puk> <pin>", "Verify PUK and change PIN (aka AT+CPIN=<puk>,<pin>)", 2,
-                            2) {
-  }
-
-  void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    if (cli.owlModem->SIM.verifyPUK(cmd.argv[0], cmd.argv[1])) {
-      LOGF(L_CLI, "OK\r\n");
-    } else {
-      LOGF(L_CLI, "ERROR\r\n");
-    }
-  }
-};
-
-
 
 class GetModemFunctionality : public OwlModemCLIExecutor {
  public:
@@ -403,7 +295,7 @@ class GetModemMNOProfile : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     at_umnoprof_mno_profile_e profile;
-    if (cli.owlModem->network.getModemMNOProfile(&profile)) {
+    if (cli.owlModem->network_rn4.getModemMNOProfile(&profile)) {
       LOGF(L_CLI, "OK profile=%d(%s)\r\n", profile, at_umnoprof_mno_profile_text(profile));
     } else {
       LOGF(L_CLI, "ERROR\r\n");
@@ -422,7 +314,7 @@ class SetModemMNOProfile : public OwlModemCLIExecutor {
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
     at_umnoprof_mno_profile_e profile = (at_umnoprof_mno_profile_e)str_to_long_int(cmd.argv[0], 10);
-    if (cli.owlModem->network.setModemMNOProfile(profile)) {
+    if (cli.owlModem->network_rn4.setModemMNOProfile(profile)) {
       LOGF(L_CLI, "OK profile=%d(%s)\r\n", profile, at_umnoprof_mno_profile_text(profile));
     } else {
       LOGF(L_CLI, "ERROR\r\n");
@@ -1184,14 +1076,15 @@ class GetGNSSData : public OwlModemCLIExecutor {
 
 #define MAX_COMMANDS 90
 
-class SSLInitializeContext: public OwlModemCLIExecutor {
-  public:
-    SSLInitializeContext() : OwlModemCLIExecutor("ssl.initializeContext", "[<context> [<cipher_suite>]]",
-        "Initializes the SSL context",
-        0, 2) {}
+class SSLInitializeContext : public OwlModemCLIExecutor {
+ public:
+  SSLInitializeContext()
+      : OwlModemCLIExecutor("ssl.initializeContext", "[<context> [<cipher_suite>]]", "Initializes the SSL context", 0,
+                            2) {
+  }
 
   void executor(OwlModemCLI &cli, OwlModemCLICommand &cmd) {
-    uint8_t context = 0;
+    uint8_t context                     = 0;
     usecprf_cipher_suite_e cipher_suite = USECPREF_CIPHER_SUITE_TLS_RSA_WITH_AES_256_CBC_SHA256;
     if (cmd.argc >= 1) context = (uint8_t)str_to_long_int(cmd.argv[1], 10);
     if (cmd.argc >= 2) context = (usecprf_cipher_suite_e)str_to_long_int(cmd.argv[2], 10);
@@ -1219,23 +1112,14 @@ OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   executors[cnt++] = owl_new PowerOn();
   executors[cnt++] = owl_new PowerOff();
 
-  executors[cnt++] = owl_new GetProductIdentification();
   executors[cnt++] = owl_new GetManufacturer();
   executors[cnt++] = owl_new GetModel();
   executors[cnt++] = owl_new GetVersion();
   executors[cnt++] = owl_new GetIMEI();
-  executors[cnt++] = owl_new GetBatteryChargeLevels();
-  executors[cnt++] = owl_new GetIndicators();
-  executors[cnt++] = owl_new GetIndicatorsHelp();
-
 
   executors[cnt++] = owl_new GetICCID();
   executors[cnt++] = owl_new GetIMSI();
-  executors[cnt++] = owl_new GetMSISDN();
   executors[cnt++] = owl_new GetPINStatus();
-  executors[cnt++] = owl_new VerifyPIN();
-  executors[cnt++] = owl_new VerifyPUK();
-
 
   executors[cnt++] = owl_new GetModemFunctionality();
   executors[cnt++] = owl_new SetModemFunctionality();

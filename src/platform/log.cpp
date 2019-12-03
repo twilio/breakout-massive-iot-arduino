@@ -32,6 +32,12 @@
 
 #include "board.h"
 
+#define LOG_WITH_TIME 1
+#define LOG_NO_ANSI_COLORS 0
+#define LOG_LINE_MAX_LEN 1024
+#define LOG_OUTPUT SerialDebugPort
+
+
 int write_reliably(USBSerial *serial, const char *buf, int len) {
   if (!serial) return 0;
   int sent = 0;
@@ -55,7 +61,7 @@ extern "C" void owl_log_set_level(log_level_t level) {
 }
 
 extern "C" int owl_log_is_printable(log_level_t level) {
-  return IS_PRINTABLE(level);
+  return level <= debug_level;
 }
 
 #if LOG_NO_ANSI_COLORS == 1
@@ -173,7 +179,7 @@ static char *owl_log_level_color(log_level_t level) {
 }
 
 extern "C" void owl_log(log_level_t level, const char *format, ...) {
-  if (!IS_PRINTABLE(level)) return;
+  if (!owl_log_is_printable(level)) return;
   char buf[LOG_LINE_MAX_LEN];
   int cnt          = 0;
   char *level_name = owl_log_level_name(level);
@@ -216,7 +222,7 @@ extern "C" void owl_log(log_level_t level, const char *format, ...) {
 }
 
 extern "C" void owl_log_empty(log_level_t level, const char *format, ...) {
-  if (!IS_PRINTABLE(level)) return;
+  if (!owl_log_is_printable(level)) return;
   char buf[LOG_LINE_MAX_LEN];
   int cnt = 0;
 
@@ -253,7 +259,7 @@ extern "C" void owl_log_empty(log_level_t level, const char *format, ...) {
 #define MAX_STR_BIN_BUFFER 64 + BIN_LOG_BYTES_PER_LINE * 10
 
 extern "C" void owl_log_str(log_level_t level, str x) {
-  if (!IS_PRINTABLE(level)) return;
+  if (!owl_log_is_printable(level)) return;
 
   int i, j, k;
   char buffer[MAX_STR_BIN_BUFFER];
