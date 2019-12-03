@@ -1056,8 +1056,6 @@ class OpenSocketAcceptTCP : public OwlModemCLIExecutor {
   }
 };
 
-
-
 class GetGNSSData : public OwlModemCLIExecutor {
  public:
   GetGNSSData() : OwlModemCLIExecutor("gnss.getGNSSData", "Retrieve GNSS data and log it.") {
@@ -1073,8 +1071,6 @@ class GetGNSSData : public OwlModemCLIExecutor {
     }
   }
 };
-
-#define MAX_COMMANDS 90
 
 class SSLInitializeContext : public OwlModemCLIExecutor {
  public:
@@ -1100,73 +1096,151 @@ OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   this->owlModem  = modem;
   this->debugPort = debug_port;
 
-  executors = (OwlModemCLIExecutor **)owl_malloc(MAX_COMMANDS * sizeof(OwlModemCLIExecutor *));
-
   int cnt          = 0;
-  executors[cnt++] = owl_new SetDebugLevel();
-  executors[cnt++] = owl_new SoftReset();
 
-  executors[cnt++] = owl_new RawBypass();
-  executors[cnt++] = owl_new RawGNSSBypass();
+  static SetDebugLevel set_debug_level_executor;
+  executors[cnt++] = &set_debug_level_executor;
 
-  executors[cnt++] = owl_new PowerOn();
-  executors[cnt++] = owl_new PowerOff();
+  static SoftReset soft_reset_executor;
+  executors[cnt++] = &soft_reset_executor;
 
-  executors[cnt++] = owl_new GetManufacturer();
-  executors[cnt++] = owl_new GetModel();
-  executors[cnt++] = owl_new GetVersion();
-  executors[cnt++] = owl_new GetIMEI();
+  static RawBypass raw_bypass_executor;
+  executors[cnt++] = &raw_bypass_executor;
 
-  executors[cnt++] = owl_new GetICCID();
-  executors[cnt++] = owl_new GetIMSI();
-  executors[cnt++] = owl_new GetPINStatus();
+  static RawGNSSBypass raw_gnss_bypass_executor;
+  executors[cnt++] = &raw_gnss_bypass_executor;
 
-  executors[cnt++] = owl_new GetModemFunctionality();
-  executors[cnt++] = owl_new SetModemFunctionality();
+  static PowerOn power_on_executor;
+  executors[cnt++] = &power_on_executor;
 
-  executors[cnt++] = owl_new GetModemMNOProfile();
-  executors[cnt++] = owl_new SetModemMNOProfile();
+  static PowerOff power_off_executor;
+  executors[cnt++] = &power_off_executor;
 
-  executors[cnt++] = owl_new GetOperatorSelection();
-  executors[cnt++] = owl_new SetOperatorSelection();
-  executors[cnt++] = owl_new GetOperatorList();
+  static GetManufacturer get_manufacturer_executor;
+  executors[cnt++] = &get_manufacturer_executor;
 
-  executors[cnt++] = owl_new GetNetworkRegistrationStatus();
-  executors[cnt++] = owl_new SetNetworkRegistrationURC();
-  executors[cnt++] = owl_new GetGPRSRegistrationStatus();
-  executors[cnt++] = owl_new SetGPRSRegistrationURC();
-  executors[cnt++] = owl_new GetEPSRegistrationStatus();
-  executors[cnt++] = owl_new SetEPSRegistrationURC();
+  static GetModel get_model_executor;
+  executors[cnt++] = &get_model_executor;
 
-  executors[cnt++] = owl_new GetSignalQuality();
+  static GetVersion get_version_executor;
+  executors[cnt++] = &get_version_executor;
 
+  static GetIMEI get_imei_executor;
+  executors[cnt++] = &get_imei_executor;
 
-  executors[cnt++] = owl_new GetAPNIPAddress();
+  static GetICCID get_iccid_executor;
+  executors[cnt++] = &get_iccid_executor;
 
+  static GetIMSI get_imsi_executor;
+  executors[cnt++] = &get_imsi_executor;
 
-  executors[cnt++] = owl_new OpenSocket();
-  executors[cnt++] = owl_new CloseSocket();
-  executors[cnt++] = owl_new GetSocketError();
-  executors[cnt++] = owl_new ConnectSocket();
-  executors[cnt++] = owl_new SendUDP();
-  executors[cnt++] = owl_new SendTCP();
-  executors[cnt++] = owl_new SendToUDP();
-  executors[cnt++] = owl_new GetQueuedForReceive();
-  executors[cnt++] = owl_new ReceiveUDP();
-  executors[cnt++] = owl_new ReceiveTCP();
-  executors[cnt++] = owl_new ReceiveFromUDP();
-  executors[cnt++] = owl_new ListenUDP();
-  executors[cnt++] = owl_new ListenTCP();
-  executors[cnt++] = owl_new AcceptTCP();
+  static GetPINStatus get_pin_status_executor;
+  executors[cnt++] = &get_pin_status_executor;
 
-  executors[cnt++] = owl_new OpenSocketListenUDP();
-  executors[cnt++] = owl_new OpenSocketListenConnectUDP();
-  executors[cnt++] = owl_new OpenSocketListenConnectTCP();
-  executors[cnt++] = owl_new OpenSocketAcceptTCP();
+  static GetModemFunctionality get_modem_functionality_executor;
+  executors[cnt++] = &get_modem_functionality_executor;
 
-  executors[cnt++] = owl_new GetGNSSData();
+  static SetModemFunctionality set_modem_functionality_executor;
+  executors[cnt++] = &set_modem_functionality_executor;
 
-  executors[cnt++] = owl_new SSLInitializeContext();
+  static GetModemMNOProfile get_modem_mno_profile_executor;
+  executors[cnt++] = &get_modem_mno_profile_executor;
+
+  static SetModemMNOProfile set_modem_mno_profile_executor;
+  executors[cnt++] = &set_modem_mno_profile_executor;
+
+  static GetOperatorSelection get_operator_selection_executor;
+  executors[cnt++] = &get_operator_selection_executor;
+
+  static SetOperatorSelection set_operator_selection_executor;
+  executors[cnt++] = &set_operator_selection_executor;
+
+  static GetOperatorList get_operator_list_executor;
+  executors[cnt++] = &get_operator_list_executor;
+
+  static GetNetworkRegistrationStatus get_network_registration_status_executor;
+  executors[cnt++] = &get_network_registration_status_executor;
+
+  static SetNetworkRegistrationURC set_network_registration_urc_executor;
+  executors[cnt++] = &set_network_registration_urc_executor;
+
+  static GetGPRSRegistrationStatus get_gprs_registration_status_executor;
+  executors[cnt++] = &get_gprs_registration_status_executor;
+
+  static SetGPRSRegistrationURC set_gprs_registration_urc_executor;
+  executors[cnt++] = &set_gprs_registration_urc_executor;
+
+  static GetEPSRegistrationStatus get_eps_registration_status_executor;
+  executors[cnt++] = &get_eps_registration_status_executor;
+
+  static SetEPSRegistrationURC set_eps_registration_urc_executor;
+  executors[cnt++] = &set_eps_registration_urc_executor;
+
+  static GetSignalQuality get_signal_quality_executor;
+  executors[cnt++] = &get_signal_quality_executor;
+
+  static GetAPNIPAddress get_apn_ip_address_executor;
+  executors[cnt++] = &get_apn_ip_address_executor;
+
+  static OpenSocket open_socket_executor;
+  executors[cnt++] = &open_socket_executor;
+
+  static CloseSocket close_socket_executor;
+  executors[cnt++] = &close_socket_executor;
+
+  static GetSocketError get_socket_error_executor;
+  executors[cnt++] = &get_socket_error_executor;
+
+  static ConnectSocket connect_socket_executor;
+  executors[cnt++] = &connect_socket_executor;
+
+  static SendUDP send_udp_executor;
+  executors[cnt++] = &send_udp_executor;
+
+  static SendTCP send_tcp_executor;
+  executors[cnt++] = &send_tcp_executor;
+
+  static SendToUDP sendto_udp_executor;
+  executors[cnt++] = &sendto_udp_executor;
+
+  static GetQueuedForReceive get_queued_for_receive_executor;
+  executors[cnt++] = &get_queued_for_receive_executor;
+
+  static ReceiveUDP receive_udp_executor;
+  executors[cnt++] = &receive_udp_executor;
+
+  static ReceiveTCP receive_tcp_executor;
+  executors[cnt++] = &receive_tcp_executor;
+
+  static ReceiveFromUDP receivefrom_udp_executor;
+  executors[cnt++] = &receivefrom_udp_executor;
+
+  static ListenUDP listen_udp_executor;
+  executors[cnt++] = &listen_udp_executor;
+
+  static ListenTCP listen_tcp_executor;
+  executors[cnt++] = &listen_tcp_executor; 
+
+  static AcceptTCP accept_tcp_executor;
+  executors[cnt++] = &accept_tcp_executor;
+
+  static OpenSocketListenUDP open_socket_listen_udp_executor;
+  executors[cnt++] = &open_socket_listen_udp_executor;
+
+  static OpenSocketListenConnectUDP open_socket_listen_connect_udp_executor;
+  executors[cnt++] = &open_socket_listen_connect_udp_executor;
+
+  static OpenSocketListenConnectTCP open_socket_listen_connect_tcp_executor;
+  executors[cnt++] = &open_socket_listen_connect_tcp_executor;
+
+  static OpenSocketAcceptTCP open_socket_accept_tcp_executor;
+  executors[cnt++] = &open_socket_accept_tcp_executor;
+
+  static GetGNSSData get_gnss_data_executor;
+  executors[cnt++] = &get_gnss_data_executor;
+
+  static SSLInitializeContext ssl_initialize_context_executor;
+  executors[cnt++] = &ssl_initialize_context_executor;
 
   executors[cnt++] = 0;
   if (cnt > MAX_COMMANDS) {
@@ -1182,14 +1256,6 @@ OwlModemCLI::OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debug_port) {
   }
   empty_spaces[MODEM_CLI_CMD_LEN] = 0;
 }
-
-OwlModemCLI::~OwlModemCLI() {
-  for (int i = 0; executors[i]; i++)
-    delete executors[i];
-  owl_free(executors);
-}
-
-
 
 static str s_help = {.s = "help", .len = 4};
 static str s_quit = {.s = "quit", .len = 4};

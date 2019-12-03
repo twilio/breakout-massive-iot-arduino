@@ -29,6 +29,7 @@
 
 #define MODEM_CLI_CMD_HISTORY 16
 #define MODEM_CLI_CMD_LEN 256
+#define MAX_COMMANDS 90
 #define MAX_CMD_PARAMS 32
 
 #define CLI_PROMPT "OwlModem-CLI > "
@@ -100,9 +101,6 @@ class OwlModemCLI {
  public:
   OwlModemCLI(OwlModemRN4 *modem, IOwlSerial *debugPort);
 
-  ~OwlModemCLI();
-
-
   /**
    * A simple CLI, to let you interactively test the API of OwlModem through the debug port. Call this function in the
    * main loop() to process user's input over USB serial and to execute commands towards the modem.
@@ -125,7 +123,7 @@ class OwlModemCLI {
 
 
  private:
-  OwlModemCLIExecutor **executors;
+  OwlModemCLIExecutor *executors[MAX_COMMANDS];
   OwlModemCLIExecutor *findExecutor(str name);
   void doHelp(str *prefix);
   void doHistory();
